@@ -42,9 +42,9 @@
       font-weight: 700;
     }
 
+    /* ── Selector de temas ── */
     #topic-screen { max-width: 560px; margin: 0 auto; }
     #topic-screen h2 { text-align: center; margin-bottom: 20px; color: var(--primary); font-size: 1.3rem; }
-
     .topics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
     .topic-btn {
@@ -57,16 +57,15 @@
       transition: all 0.18s;
       box-shadow: 0 2px 12px rgba(0,0,0,0.07);
     }
-
     .topic-btn:hover {
       border-color: var(--primary-light);
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(108,99,255,0.15);
     }
-
     .topic-btn .emoji { font-size: 2.2rem; display: block; margin-bottom: 8px; }
     .topic-btn .label { font-size: 1rem; font-weight: 700; color: var(--text); }
 
+    /* ── Chat ── */
     #chat-screen { max-width: 600px; margin: 0 auto; display: none; }
 
     .chat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -90,8 +89,8 @@
       background: var(--card);
       border-radius: var(--radius);
       padding: 16px;
-      min-height: 280px;
-      max-height: 380px;
+      min-height: 220px;
+      max-height: 300px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -108,7 +107,6 @@
       line-height: 1.5;
       animation: fadeIn 0.25s ease;
     }
-
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
     .msg.ai { background: #f0eeff; color: var(--text); border-bottom-left-radius: 4px; align-self: flex-start; }
@@ -124,7 +122,8 @@
       max-width: 100%;
     }
 
-    .word-meter { background: var(--card); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    /* ── Medidor ── */
+    .word-meter { background: var(--card); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .word-meter-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
     .word-meter-label span:last-child { font-weight: 700; color: var(--primary); }
     .progress-track { background: #f0eeff; border-radius: 99px; height: 10px; overflow: hidden; }
@@ -133,6 +132,62 @@
     .milestone { font-size: 0.72rem; color: var(--muted); text-align: center; flex: 1; }
     .milestone.reached { color: var(--success); font-weight: 700; }
 
+    /* ── Panel de palabras ── */
+    .word-panel {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .word-panel-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .word-panel-tabs::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      background: #f0eeff;
+      color: var(--primary);
+      border: none;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+    .tab-btn:hover:not(.active) { background: #e0d9ff; }
+
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      background: #f8f9ff;
+      border: 1.5px solid #e0d9ff;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text);
+      font-weight: 500;
+      user-select: none;
+    }
+    .chip:hover { background: #e0d9ff; border-color: var(--primary-light); transform: scale(1.04); }
+    .chip:active { transform: scale(0.97); background: var(--primary-light); color: #fff; }
+
+    /* ── Área de entrada ── */
     .input-area { display: flex; gap: 8px; align-items: flex-end; }
     .input-wrap { flex: 1; }
 
@@ -161,29 +216,30 @@
     .send-btn:active { transform: scale(0.95); }
     .send-btn:disabled { background: #b2bec3; cursor: not-allowed; }
 
-    .hint-btn {
-      background: #fff; color: var(--primary); border: 2px solid var(--primary-light);
-      border-radius: 14px; padding: 0 16px; height: 52px; font-size: 0.85rem;
-      cursor: pointer; font-weight: 700; transition: all 0.18s; flex-shrink: 0;
+    .clear-btn {
+      background: #fff; color: var(--muted); border: 2px solid #dfe6e9;
+      border-radius: 14px; width: 52px; height: 52px; font-size: 1.2rem;
+      cursor: pointer; transition: all 0.15s; flex-shrink: 0;
     }
-    .hint-btn:hover { background: #f0eeff; }
+    .clear-btn:hover { border-color: #ff7675; color: #ff7675; }
 
+    /* ── Stats ── */
     .stats-bar {
       display: flex; justify-content: space-around; background: var(--card);
-      border-radius: var(--radius); padding: 12px 8px; margin-top: 16px;
+      border-radius: var(--radius); padding: 12px 8px; margin-top: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .stat { text-align: center; }
     .stat .val { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
     .stat .lbl { font-size: 0.72rem; color: var(--muted); }
 
+    /* ── Popup hito ── */
     #milestone-popup {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.35); z-index: 100;
       justify-content: center; align-items: center;
     }
     #milestone-popup.show { display: flex; }
-
     .popup-card {
       background: var(--card); border-radius: 24px; padding: 36px 32px;
       text-align: center; max-width: 320px; width: 90%;
@@ -201,7 +257,6 @@
     @media (max-width: 420px) {
       .topics-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
       .topic-btn { padding: 16px 10px; }
-      .hint-btn { padding: 0 10px; font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -213,6 +268,7 @@
   <div class="stars-bar">⭐ <span id="total-stars">0</span> estrellas totales</div>
 </header>
 
+<!-- Selector de temas -->
 <div id="topic-screen">
   <h2>¿De qué quieres hablar hoy?</h2>
   <div class="topics-grid">
@@ -225,6 +281,7 @@
   </div>
 </div>
 
+<!-- Chat -->
 <div id="chat-screen">
   <div class="chat-header">
     <span class="topic-icon" id="chat-icon"></span>
@@ -251,12 +308,18 @@
     </div>
   </div>
 
+  <!-- Panel de palabras -->
+  <div class="word-panel">
+    <div class="word-panel-tabs" id="word-tabs"></div>
+    <div class="word-chips" id="word-chips"></div>
+  </div>
+
   <div class="input-area">
     <div class="input-wrap">
-      <textarea id="user-input" placeholder="Escribe aquí..." rows="1"
+      <textarea id="user-input" placeholder="Escribe aquí o toca las palabras de arriba..." rows="1"
         oninput="onInput()" onkeydown="onKey(event)"></textarea>
     </div>
-    <button class="hint-btn" onclick="showHint()">💡 Pista</button>
+    <button class="clear-btn" onclick="clearInput()" title="Borrar">✕</button>
     <button class="send-btn" onclick="sendMessage()" id="send-btn" disabled>➤</button>
   </div>
 
@@ -267,6 +330,7 @@
   </div>
 </div>
 
+<!-- Popup hito -->
 <div id="milestone-popup">
   <div class="popup-card">
     <span class="big-emoji" id="popup-emoji">🌟</span>
@@ -277,232 +341,231 @@
 </div>
 
 <script>
+// ── Banco de palabras ────────────────────────────────────────────────────────
+const WORD_BANK = {
+  comunes: {
+    label: '🔗 Conectores',
+    words: ['porque', 'también', 'y', 'pero', 'cuando', 'siempre', 'nunca', 'a veces',
+            'mucho', 'muy', 'bastante', 'un poco', 'hoy', 'ayer', 'mañana',
+            'me gusta', 'no me gusta', 'quiero', 'me encanta', 'odio'],
+  },
+  sujetos: {
+    label: '👤 Quién',
+    words: ['yo', 'mi familia', 'mis amigos', 'mi hermano', 'mi hermana',
+            'mi madre', 'mi padre', 'todos', 'nadie', 'solo', 'sola'],
+  },
+  sentimientos: {
+    label: '😊 Cómo me siento',
+    words: ['contento', 'feliz', 'bien', 'mal', 'cansado', 'aburrido',
+            'emocionado', 'nervioso', 'tranquilo', 'enfadado', 'triste',
+            'divertido', 'genial', 'increíble', 'chulo', 'guay'],
+  },
+  dia: {
+    label: '🌞 Mi día',
+    words: ['en casa', 'en el cole', 'en el parque', 'en el patio',
+            'he comido', 'he jugado', 'he visto', 'he estado', 'he hablado',
+            'esta mañana', 'esta tarde', 'esta noche', 'después de comer',
+            'lo mejor', 'lo peor', 'ha sido', 'ha pasado'],
+  },
+  juegos: {
+    label: '🎮 Juegos',
+    words: ['juego', 'juego a', 'mi personaje', 'el nivel', 'la partida',
+            'ganar', 'perder', 'jugar online', 'en la consola', 'en el móvil',
+            'en el PC', 'con mis amigos', 'solo', 'es difícil', 'es fácil',
+            'mola mucho', 'es mi favorito', 'llevo', 'muchas horas'],
+  },
+  series: {
+    label: '🎬 Series',
+    words: ['la serie', 'la película', 'el personaje', 'el capítulo',
+            'he visto', 'estoy viendo', 'quiero ver', 'trata de',
+            'me gusta porque', 'lo mejor es', 'el final', 'la historia',
+            'en Netflix', 'en YouTube', 'muy emocionante', 'muy divertida'],
+  },
+  animales: {
+    label: '🐾 Animales',
+    words: ['el animal', 'mi mascota', 'se llama', 'vive en', 'come',
+            'es grande', 'es pequeño', 'es bonito', 'es peligroso',
+            'puede volar', 'puede nadar', 'corre mucho', 'hace ruido',
+            'me da miedo', 'me encanta', 'lo he visto', 'en el zoo'],
+  },
+  comida: {
+    label: '🍕 Comida',
+    words: ['mi comida favorita', 'me gusta comer', 'está muy rico', 'está buenísimo',
+            'en casa', 'en el restaurante', 'lo hace mi madre', 'para comer',
+            'para cenar', 'para desayunar', 'de postre', 'tiene', 'lleva',
+            'con mucho', 'sin', 'caliente', 'frío', 'dulce', 'salado'],
+  },
+  lugares: {
+    label: '🗺️ Lugares',
+    words: ['mi lugar favorito', 'voy con', 'está cerca', 'está lejos',
+            'hay que ir en coche', 'puedo ir andando', 'cuando voy allí',
+            'lo que más me gusta', 'siempre hago', 'la última vez',
+            'en verano', 'en invierno', 'al aire libre', 'dentro'],
+  },
+};
+
+// ── Preguntas y respuestas por tema ─────────────────────────────────────────
 const TOPICS = {
   dia: {
-    name: 'Mi día',
-    emoji: '🌞',
+    name: 'Mi día', emoji: '🌞',
     starter: '¡Hola! Cuéntame, ¿cómo ha sido tu día hoy?',
+    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'dia'],
     responses: [
-      { praise: '¡Qué bien que me lo cuentas!',         q: '¿Qué es lo que más te ha gustado de hoy?' },
-      { praise: '¡Genial, gracias por contármelo!',     q: '¿Has hecho algo divertido esta tarde?' },
-      { praise: '¡Eso suena muy bien!',                 q: '¿Con quién has estado hoy?' },
-      { praise: '¡Me encanta lo que me dices!',         q: '¿Ha pasado algo especial o diferente hoy?' },
-      { praise: '¡Qué día más interesante!',            q: '¿Qué harías mañana si pudieras elegir?' },
-      { praise: '¡Muy bien explicado!',                 q: '¿Hay algo que te haya puesto de buen humor hoy?' },
-      { praise: '¡Qué chulo!',                          q: '¿A qué hora te has levantado hoy?' },
-      { praise: '¡Me alegra mucho escucharte!',         q: '¿Has comido algo rico hoy?' },
-      { praise: '¡Genial, sigue contándome!',           q: '¿Hay algo que te haya parecido aburrido o pesado hoy?' },
-      { praise: '¡Eso está muy bien!',                  q: '¿Has aprendido algo nuevo hoy?' },
-      { praise: '¡Qué buena noticia!',                  q: '¿Has estado en algún sitio hoy fuera de casa?' },
-      { praise: '¡Me parece genial!',                   q: '¿Qué es lo primero que haces cuando llegas a casa?' },
-      { praise: '¡Interesante!',                        q: '¿Hay algo que te gustaría repetir de este día?' },
-      { praise: '¡Qué bien!',                           q: '¿Has hablado con algún amigo o amiga hoy?' },
-      { praise: '¡Eso mola mucho!',                     q: '¿Cómo te sientes ahora mismo?' },
-      { praise: '¡Muy bien!',                           q: '¿Hay algo que te apetezca hacer esta noche?' },
-      { praise: '¡Qué día tan completo!',               q: '¿Ha habido algo que te haya sorprendido hoy?' },
-      { praise: '¡Estupendo!',                          q: '¿Qué parte del día es tu favorita, la mañana o la tarde?' },
-      { praise: '¡Sigue así!',                          q: '¿Tienes ganas de que llegue mañana?' },
-      { praise: '¡Eso es genial!',                      q: '¿Qué fue lo último que hiciste antes de hablar conmigo?' },
-    ],
-    hints: [
-      'Puedes decir: "Hoy he estado en..."',
-      'Prueba con: "Lo mejor del día ha sido..."',
-      'Puedes contar: "Esta mañana he..."',
-      'Intenta: "Me ha gustado mucho cuando..."',
-      'Puedes decir: "He comido..."',
-      'Prueba con: "He jugado a..."',
-      'Puedes contar: "He hablado con..."',
-      'Intenta: "Esta tarde he..."',
+      { praise: '¡Qué bien que me lo cuentas!',       q: '¿Qué es lo que más te ha gustado de hoy?' },
+      { praise: '¡Genial, gracias por contármelo!',   q: '¿Has hecho algo divertido esta tarde?' },
+      { praise: '¡Eso suena muy bien!',               q: '¿Con quién has estado hoy?' },
+      { praise: '¡Me encanta lo que me dices!',       q: '¿Ha pasado algo especial o diferente hoy?' },
+      { praise: '¡Qué día más interesante!',          q: '¿Qué harías mañana si pudieras elegir?' },
+      { praise: '¡Muy bien explicado!',               q: '¿Hay algo que te haya puesto de buen humor hoy?' },
+      { praise: '¡Qué chulo!',                        q: '¿A qué hora te has levantado hoy?' },
+      { praise: '¡Me alegra mucho escucharte!',       q: '¿Has comido algo rico hoy?' },
+      { praise: '¡Genial, sigue contándome!',         q: '¿Hay algo que te haya parecido aburrido o pesado hoy?' },
+      { praise: '¡Eso está muy bien!',                q: '¿Has aprendido algo nuevo hoy?' },
+      { praise: '¡Qué buena noticia!',                q: '¿Has estado en algún sitio hoy fuera de casa?' },
+      { praise: '¡Me parece genial!',                 q: '¿Qué es lo primero que haces cuando llegas a casa?' },
+      { praise: '¡Interesante!',                      q: '¿Hay algo que te gustaría repetir de este día?' },
+      { praise: '¡Qué bien!',                         q: '¿Has hablado con algún amigo o amiga hoy?' },
+      { praise: '¡Eso mola mucho!',                   q: '¿Cómo te sientes ahora mismo?' },
+      { praise: '¡Muy bien!',                         q: '¿Hay algo que te apetezca hacer esta noche?' },
+      { praise: '¡Qué día tan completo!',             q: '¿Ha habido algo que te haya sorprendido hoy?' },
+      { praise: '¡Estupendo!',                        q: '¿Qué parte del día es tu favorita, la mañana o la tarde?' },
+      { praise: '¡Sigue así!',                        q: '¿Tienes ganas de que llegue mañana?' },
+      { praise: '¡Eso es genial!',                    q: '¿Qué fue lo último que hiciste antes de hablar conmigo?' },
     ],
   },
-
   juegos: {
-    name: 'Juegos',
-    emoji: '🎮',
+    name: 'Juegos', emoji: '🎮',
     starter: '¡Hola! ¿A qué juego te gusta jugar más?',
+    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'juegos'],
     responses: [
-      { praise: '¡Ese juego mola muchísimo!',           q: '¿Qué es lo que más te gusta de ese juego?' },
-      { praise: '¡Qué buena elección!',                 q: '¿Juegas solo o con amigos?' },
-      { praise: '¡Genial, eres un crack!',              q: '¿Cuánto tiempo llevas jugando a ese juego?' },
-      { praise: '¡Me parece muy chulo!',                q: '¿Cuál es tu personaje o modo favorito?' },
-      { praise: '¡Eso suena muy divertido!',            q: '¿Hay algún nivel o parte del juego que te resulte difícil?' },
-      { praise: '¡Qué pasada!',                         q: '¿Le has recomendado ese juego a alguien?' },
-      { praise: '¡Increíble!',                          q: '¿Cuál es tu mejor puntuación o logro en ese juego?' },
-      { praise: '¡Eso está muy bien!',                  q: '¿Prefieres jugar en consola, móvil o PC?' },
-      { praise: '¡Qué guay!',                           q: '¿Hay algún juego que quieras probar pronto?' },
-      { praise: '¡Me encanta que me lo cuentes!',       q: '¿Tienes algún truco o estrategia especial?' },
-      { praise: '¡Eso mola un montón!',                 q: '¿Cuánto tiempo sueles jugar cada día?' },
-      { praise: '¡Muy interesante!',                    q: '¿Hay algún personaje del juego que no te guste nada?' },
-      { praise: '¡Genial!',                             q: '¿Recuerdas la primera vez que jugaste a ese juego?' },
-      { praise: '¡Qué chulo que seas tan bueno!',       q: '¿Te gusta más ganar o disfrutar del juego?' },
-      { praise: '¡Fantástico!',                         q: '¿Hay música en el juego que te guste especialmente?' },
-      { praise: '¡Brutal!',                             q: '¿Cuál ha sido el momento más emocionante que has vivido jugando?' },
-      { praise: '¡Eso es alucinante!',                  q: '¿Juegas online con gente de otros sitios?' },
-      { praise: '¡Vaya crack!',                         q: '¿Qué juego has dejado de jugar y echas de menos?' },
-      { praise: '¡Super guay!',                         q: '¿Hay algún juego que te parezca demasiado fácil?' },
-      { praise: '¡Me parece genial!',                   q: '¿Qué tipo de juegos te gustan más: aventura, deportes, lucha...?' },
-    ],
-    hints: [
-      'Puedes decir: "Mi juego favorito es..."',
-      'Prueba con: "Lo que más me gusta es..."',
-      'Puedes contar: "Juego con..."',
-      'Intenta: "El mejor nivel es..."',
-      'Puedes decir: "Llevo jugando desde..."',
-      'Prueba con: "Mi personaje favorito es..."',
-      'Puedes contar: "Lo más difícil del juego es..."',
-      'Intenta: "Cuando juego me siento..."',
+      { praise: '¡Ese juego mola muchísimo!',         q: '¿Qué es lo que más te gusta de ese juego?' },
+      { praise: '¡Qué buena elección!',               q: '¿Juegas solo o con amigos?' },
+      { praise: '¡Genial, eres un crack!',            q: '¿Cuánto tiempo llevas jugando a ese juego?' },
+      { praise: '¡Me parece muy chulo!',              q: '¿Cuál es tu personaje o modo favorito?' },
+      { praise: '¡Eso suena muy divertido!',          q: '¿Hay algún nivel o parte del juego que te resulte difícil?' },
+      { praise: '¡Qué pasada!',                       q: '¿Le has recomendado ese juego a alguien?' },
+      { praise: '¡Increíble!',                        q: '¿Cuál es tu mejor puntuación o logro en ese juego?' },
+      { praise: '¡Eso está muy bien!',                q: '¿Prefieres jugar en consola, móvil o PC?' },
+      { praise: '¡Qué guay!',                         q: '¿Hay algún juego que quieras probar pronto?' },
+      { praise: '¡Me encanta que me lo cuentes!',     q: '¿Tienes algún truco o estrategia especial?' },
+      { praise: '¡Eso mola un montón!',               q: '¿Cuánto tiempo sueles jugar cada día?' },
+      { praise: '¡Muy interesante!',                  q: '¿Hay algún personaje del juego que no te guste nada?' },
+      { praise: '¡Genial!',                           q: '¿Recuerdas la primera vez que jugaste a ese juego?' },
+      { praise: '¡Qué chulo que seas tan bueno!',     q: '¿Te gusta más ganar o disfrutar del juego?' },
+      { praise: '¡Fantástico!',                       q: '¿Hay música en el juego que te guste especialmente?' },
+      { praise: '¡Brutal!',                           q: '¿Cuál ha sido el momento más emocionante jugando?' },
+      { praise: '¡Eso es alucinante!',                q: '¿Juegas online con gente de otros sitios?' },
+      { praise: '¡Vaya crack!',                       q: '¿Qué juego has dejado de jugar y echas de menos?' },
+      { praise: '¡Super guay!',                       q: '¿Hay algún juego que te parezca demasiado fácil?' },
+      { praise: '¡Me parece genial!',                 q: '¿Qué tipo de juegos te gustan más: aventura, deportes, lucha...?' },
     ],
   },
-
   series: {
-    name: 'Series y Pelis',
-    emoji: '🎬',
+    name: 'Series y Pelis', emoji: '🎬',
     starter: '¡Hola! ¿Tienes alguna serie o película favorita?',
+    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'series'],
     responses: [
-      { praise: '¡Uy, eso me suena muy bien!',          q: '¿De qué trata esa serie o película?' },
-      { praise: '¡Qué buena elección!',                 q: '¿Cuál es tu personaje favorito y por qué?' },
-      { praise: '¡Me apunto a verla!',                  q: '¿La has visto más de una vez?' },
-      { praise: '¡Eso suena emocionante!',              q: '¿Qué parte te ha gustado más?' },
-      { praise: '¡Qué interesante!',                    q: '¿Se la has recomendado a alguien?' },
-      { praise: '¡Muy buena descripción!',              q: '¿Hay alguna otra serie o peli que también te guste?' },
-      { praise: '¡Genial!',                             q: '¿Dónde la ves, en la tele o en alguna plataforma?' },
-      { praise: '¡Qué chulo!',                          q: '¿Hay algún capítulo o escena que recuerdes especialmente?' },
-      { praise: '¡Me encanta!',                         q: '¿Hay algún personaje que no te guste nada?' },
-      { praise: '¡Vaya, eso mola!',                     q: '¿Cuántos capítulos o temporadas tiene?' },
-      { praise: '¡Qué bien lo explicas!',               q: '¿La ves solo o con alguien?' },
-      { praise: '¡Impresionante!',                      q: '¿Hay algún momento que te haya dado miedo o sorprendido mucho?' },
-      { praise: '¡Muy interesante!',                    q: '¿Qué tipo de series o pelis te gustan más: acción, comedia, aventuras...?' },
-      { praise: '¡Qué buena pinta!',                    q: '¿Hay alguna serie o peli que hayas dejado a medias?' },
-      { praise: '¡Eso suena genial!',                   q: '¿Hay algún actor o actriz que te guste mucho?' },
-      { praise: '¡Brutal!',                             q: '¿Esperabas el final o te sorprendió?' },
-      { praise: '¡Genial elección!',                    q: '¿Crees que harán más temporadas o una segunda parte?' },
-      { praise: '¡Qué pasada!',                         q: '¿Hay alguna frase o momento que recuerdes siempre?' },
-      { praise: '¡Estupendo!',                          q: '¿Con qué personaje te identifies más?' },
-      { praise: '¡Muy chulo!',                          q: '¿Hay alguna serie o peli que quieras ver pronto?' },
-    ],
-    hints: [
-      'Puedes decir: "Mi serie favorita es..."',
-      'Prueba con: "Trata de un/una..."',
-      'Puedes contar: "Mi personaje favorito es..."',
-      'Intenta: "Lo mejor es cuando..."',
-      'Puedes decir: "La he visto en..."',
-      'Prueba con: "Tiene muchos/pocos capítulos..."',
-      'Puedes contar: "La veo con..."',
-      'Intenta: "Me gusta porque..."',
+      { praise: '¡Uy, eso me suena muy bien!',        q: '¿De qué trata esa serie o película?' },
+      { praise: '¡Qué buena elección!',               q: '¿Cuál es tu personaje favorito y por qué?' },
+      { praise: '¡Me apunto a verla!',                q: '¿La has visto más de una vez?' },
+      { praise: '¡Eso suena emocionante!',            q: '¿Qué parte te ha gustado más?' },
+      { praise: '¡Qué interesante!',                  q: '¿Se la has recomendado a alguien?' },
+      { praise: '¡Muy buena descripción!',            q: '¿Hay alguna otra serie o peli que también te guste?' },
+      { praise: '¡Genial!',                           q: '¿Dónde la ves, en la tele o en alguna plataforma?' },
+      { praise: '¡Qué chulo!',                        q: '¿Hay algún capítulo o escena que recuerdes especialmente?' },
+      { praise: '¡Me encanta!',                       q: '¿Hay algún personaje que no te guste nada?' },
+      { praise: '¡Vaya, eso mola!',                   q: '¿Cuántos capítulos o temporadas tiene?' },
+      { praise: '¡Qué bien lo explicas!',             q: '¿La ves solo o con alguien?' },
+      { praise: '¡Impresionante!',                    q: '¿Hay algún momento que te haya sorprendido mucho?' },
+      { praise: '¡Muy interesante!',                  q: '¿Qué tipo de series te gustan más: acción, comedia, aventuras...?' },
+      { praise: '¡Qué buena pinta!',                  q: '¿Hay alguna serie o peli que hayas dejado a medias?' },
+      { praise: '¡Eso suena genial!',                 q: '¿Hay algún actor o actriz que te guste mucho?' },
+      { praise: '¡Brutal!',                           q: '¿Esperabas el final o te sorprendió?' },
+      { praise: '¡Genial elección!',                  q: '¿Crees que harán más temporadas o una segunda parte?' },
+      { praise: '¡Qué pasada!',                       q: '¿Hay alguna frase o momento que recuerdes siempre?' },
+      { praise: '¡Estupendo!',                        q: '¿Con qué personaje te identificas más?' },
+      { praise: '¡Muy chulo!',                        q: '¿Hay alguna serie o peli que quieras ver pronto?' },
     ],
   },
-
   animales: {
-    name: 'Animales',
-    emoji: '🐾',
+    name: 'Animales', emoji: '🐾',
     starter: '¡Hola! ¿Tienes algún animal favorito?',
+    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'animales'],
     responses: [
-      { praise: '¡Qué animal tan chulo has elegido!',   q: '¿Por qué te gusta tanto ese animal?' },
-      { praise: '¡Es un animal increíble!',             q: '¿Sabes algo curioso sobre ese animal?' },
-      { praise: '¡Me encanta tu elección!',             q: '¿Tienes o te gustaría tener ese animal en casa?' },
-      { praise: '¡Qué bonito!',                         q: '¿Cómo sería un día con ese animal?' },
-      { praise: '¡Muy interesante!',                    q: '¿Dónde vive ese animal normalmente?' },
-      { praise: '¡Genial!',                             q: '¿Qué come ese animal?' },
-      { praise: '¡Qué chulo!',                          q: '¿Es un animal grande o pequeño?' },
-      { praise: '¡Me parece fascinante!',               q: '¿Ese animal hace algún sonido especial?' },
-      { praise: '¡Muy buena elección!',                 q: '¿Sabes si ese animal duerme de día o de noche?' },
-      { praise: '¡Qué animal tan especial!',            q: '¿Te gustaría ver ese animal en la naturaleza o en un zoo?' },
-      { praise: '¡Increíble!',                          q: '¿Ese animal puede ser peligroso?' },
-      { praise: '¡Eso mola mucho!',                     q: '¿Sabes cuánto tiempo vive ese animal?' },
-      { praise: '¡Qué interesante!',                    q: '¿Ese animal tiene algún color o característica especial?' },
-      { praise: '¡Fascinante!',                         q: '¿Hay algún animal que te dé miedo?' },
-      { praise: '¡Genial!',                             q: '¿Prefieres los animales domésticos o los salvajes?' },
-      { praise: '¡Qué bueno!',                          q: '¿Ese animal nada, vuela o corre?' },
-      { praise: '¡Me encanta!',                         q: '¿Has visto ese animal alguna vez en persona?' },
-      { praise: '¡Estupendo!',                          q: '¿Qué nombre le pondrías si fuera tu mascota?' },
-      { praise: '¡Muy chulo!',                          q: '¿Sabes si ese animal vive en grupo o solo?' },
-      { praise: '¡Qué pasada!',                         q: '¿Hay otro animal que también te guste mucho?' },
-    ],
-    hints: [
-      'Puedes decir: "Mi animal favorito es..."',
-      'Prueba con: "Me gusta porque..."',
-      'Puedes contar: "Tiene/puede..."',
-      'Intenta: "Lo que más me gusta de él/ella es..."',
-      'Puedes decir: "Vive en..."',
-      'Prueba con: "Come..."',
-      'Puedes contar: "Es grande/pequeño y..."',
-      'Intenta: "Si tuviera uno lo llamaría..."',
+      { praise: '¡Qué animal tan chulo has elegido!', q: '¿Por qué te gusta tanto ese animal?' },
+      { praise: '¡Es un animal increíble!',           q: '¿Sabes algo curioso sobre ese animal?' },
+      { praise: '¡Me encanta tu elección!',           q: '¿Tienes o te gustaría tener ese animal en casa?' },
+      { praise: '¡Qué bonito!',                       q: '¿Cómo sería un día con ese animal?' },
+      { praise: '¡Muy interesante!',                  q: '¿Dónde vive ese animal normalmente?' },
+      { praise: '¡Genial!',                           q: '¿Qué come ese animal?' },
+      { praise: '¡Qué chulo!',                        q: '¿Es un animal grande o pequeño?' },
+      { praise: '¡Me parece fascinante!',             q: '¿Ese animal hace algún sonido especial?' },
+      { praise: '¡Muy buena elección!',               q: '¿Sabes si ese animal duerme de día o de noche?' },
+      { praise: '¡Qué animal tan especial!',          q: '¿Te gustaría verlo en la naturaleza o en un zoo?' },
+      { praise: '¡Increíble!',                        q: '¿Ese animal puede ser peligroso?' },
+      { praise: '¡Eso mola mucho!',                   q: '¿Sabes cuánto tiempo vive ese animal?' },
+      { praise: '¡Qué interesante!',                  q: '¿Ese animal tiene algún color o característica especial?' },
+      { praise: '¡Fascinante!',                       q: '¿Hay algún animal que te dé miedo?' },
+      { praise: '¡Genial!',                           q: '¿Prefieres los animales domésticos o los salvajes?' },
+      { praise: '¡Qué bueno!',                        q: '¿Ese animal nada, vuela o corre?' },
+      { praise: '¡Me encanta!',                       q: '¿Has visto ese animal alguna vez en persona?' },
+      { praise: '¡Estupendo!',                        q: '¿Qué nombre le pondrías si fuera tu mascota?' },
+      { praise: '¡Muy chulo!',                        q: '¿Sabes si ese animal vive en grupo o solo?' },
+      { praise: '¡Qué pasada!',                       q: '¿Hay otro animal que también te guste mucho?' },
     ],
   },
-
   comida: {
-    name: 'Comida',
-    emoji: '🍕',
+    name: 'Comida', emoji: '🍕',
     starter: '¡Hola! ¿Cuál es tu comida favorita?',
+    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'comida'],
     responses: [
-      { praise: '¡Mmm, qué rico!',                      q: '¿Por qué te gusta tanto esa comida?' },
-      { praise: '¡Qué buena elección!',                 q: '¿Cuándo la comes normalmente, en casa o fuera?' },
-      { praise: '¡Se me hace la boca agua!',            q: '¿Quién la hace mejor, en casa o en algún sitio especial?' },
-      { praise: '¡Excelente gusto!',                    q: '¿Hay algún ingrediente que le pondrías o quitarías?' },
-      { praise: '¡Genial!',                             q: '¿Hay alguna comida que no te guste nada?' },
-      { praise: '¡Muy buena elección!',                 q: '¿Te gustaría aprender a hacerla algún día?' },
-      { praise: '¡Qué rico suena!',                     q: '¿La comes sola o con algo más?' },
-      { praise: '¡Eso está delicioso!',                 q: '¿Qué bebes cuando comes eso?' },
-      { praise: '¡Me encanta esa comida también!',      q: '¿La comes siempre igual o hay variaciones que te gusten?' },
-      { praise: '¡Qué bien!',                           q: '¿Con qué frecuencia la comes?' },
-      { praise: '¡Delicioso!',                          q: '¿Hay alguna comida que comas solo en ocasiones especiales?' },
-      { praise: '¡Eso suena increíble!',                q: '¿Tienes alguna comida favorita para el desayuno?' },
-      { praise: '¡Qué buena pinta!',                    q: '¿Prefieres la comida dulce o salada?' },
-      { praise: '¡Muy rico!',                           q: '¿Hay algún plato que te recuerde a algún momento especial?' },
-      { praise: '¡Estupendo!',                          q: '¿Te gusta probar comidas nuevas o prefieres las de siempre?' },
-      { praise: '¡Fantástico!',                         q: '¿Hay algún postre que te guste especialmente?' },
-      { praise: '¡Qué apetito!',                        q: '¿Cuál es tu merienda favorita?' },
-      { praise: '¡Qué sabroso!',                        q: '¿Hay alguna comida que hayas probado de otro país?' },
-      { praise: '¡Me da hambre solo con escucharte!',   q: '¿Hay algo que nunca falta en tu plato?' },
-      { praise: '¡Eso suena genial!',                   q: '¿Qué comida pedirías si pudieras elegir para hoy?' },
-    ],
-    hints: [
-      'Puedes decir: "Mi comida favorita es..."',
-      'Prueba con: "Me gusta porque está muy..."',
-      'Puedes contar: "La como cuando..."',
-      'Intenta: "Lo mejor es..."',
-      'Puedes decir: "La hace..."',
-      'Prueba con: "Tiene..."',
-      'Puedes contar: "La como con..."',
-      'Intenta: "Me la como siempre que..."',
+      { praise: '¡Mmm, qué rico!',                    q: '¿Por qué te gusta tanto esa comida?' },
+      { praise: '¡Qué buena elección!',               q: '¿Cuándo la comes normalmente, en casa o fuera?' },
+      { praise: '¡Se me hace la boca agua!',          q: '¿Quién la hace mejor, en casa o en algún sitio especial?' },
+      { praise: '¡Excelente gusto!',                  q: '¿Hay algún ingrediente que le pondrías o quitarías?' },
+      { praise: '¡Genial!',                           q: '¿Hay alguna comida que no te guste nada?' },
+      { praise: '¡Muy buena elección!',               q: '¿Te gustaría aprender a hacerla algún día?' },
+      { praise: '¡Qué rico suena!',                   q: '¿La comes sola o con algo más?' },
+      { praise: '¡Eso está delicioso!',               q: '¿Qué bebes cuando comes eso?' },
+      { praise: '¡Me encanta esa comida también!',    q: '¿La comes siempre igual o hay variaciones que te gusten?' },
+      { praise: '¡Qué bien!',                         q: '¿Con qué frecuencia la comes?' },
+      { praise: '¡Delicioso!',                        q: '¿Hay alguna comida que comas solo en ocasiones especiales?' },
+      { praise: '¡Eso suena increíble!',              q: '¿Tienes alguna comida favorita para el desayuno?' },
+      { praise: '¡Qué buena pinta!',                  q: '¿Prefieres la comida dulce o salada?' },
+      { praise: '¡Muy rico!',                         q: '¿Hay algún plato que te recuerde a algún momento especial?' },
+      { praise: '¡Estupendo!',                        q: '¿Te gusta probar comidas nuevas o prefieres las de siempre?' },
+      { praise: '¡Fantástico!',                       q: '¿Hay algún postre que te guste especialmente?' },
+      { praise: '¡Qué apetito!',                      q: '¿Cuál es tu merienda favorita?' },
+      { praise: '¡Qué sabroso!',                      q: '¿Hay alguna comida que hayas probado de otro país?' },
+      { praise: '¡Me da hambre solo con escucharte!', q: '¿Hay algo que nunca falta en tu plato?' },
+      { praise: '¡Eso suena genial!',                 q: '¿Qué comida pedirías si pudieras elegir para hoy?' },
     ],
   },
-
   lugares: {
-    name: 'Lugares',
-    emoji: '🗺️',
+    name: 'Lugares', emoji: '🗺️',
     starter: '¡Hola! ¿Cuál es tu lugar favorito para ir?',
+    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'lugares'],
     responses: [
-      { praise: '¡Ese sitio suena genial!',             q: '¿Qué es lo que más te gusta de ese lugar?' },
-      { praise: '¡Qué buena elección!',                 q: '¿Con quién vas normalmente a ese lugar?' },
-      { praise: '¡Me encantaría ir!',                   q: '¿Qué haces cuando estás allí?' },
-      { praise: '¡Qué sitio tan chulo!',                q: '¿Cuándo fue la última vez que fuiste?' },
-      { praise: '¡Eso suena muy bien!',                 q: '¿Hay algo que siempre haces cuando vas a ese lugar?' },
-      { praise: '¡Muy bien descrito!',                  q: '¿Hay algún otro lugar al que te gustaría ir?' },
-      { praise: '¡Qué bonito debe ser!',                q: '¿Está cerca de tu casa o hay que ir en coche?' },
-      { praise: '¡Genial!',                             q: '¿En qué época del año te gusta más ir?' },
-      { praise: '¡Qué sitio tan especial!',             q: '¿Hay algún olor, sonido o cosa especial de ese lugar que recuerdes?' },
-      { praise: '¡Me parece fantástico!',               q: '¿Has ido muchas veces o solo alguna vez?' },
-      { praise: '¡Eso mola mucho!',                     q: '¿Qué es lo primero que haces cuando llegas allí?' },
-      { praise: '¡Qué bien!',                           q: '¿Hay algo que te gustaría cambiar de ese lugar?' },
-      { praise: '¡Suena increíble!',                    q: '¿Prefieres los lugares con mucha gente o tranquilos?' },
-      { praise: '¡Qué interesante!',                    q: '¿Hay algún sitio al que nunca hayas ido pero quieras ir?' },
-      { praise: '¡Muy chulo!',                          q: '¿Hay alguna tienda, parque o sitio especial cerca de allí?' },
-      { praise: '¡Genial!',                             q: '¿Ese lugar es de interior o al aire libre?' },
-      { praise: '¡Qué guay!',                           q: '¿Qué comida o cosa compras cuando vas allí?' },
-      { praise: '¡Estupendo!',                          q: '¿Le recomendarías ese lugar a un amigo?' },
-      { praise: '¡Qué buena descripción!',              q: '¿Hay alguna foto tuya en ese lugar?' },
-      { praise: '¡Maravilloso!',                        q: '¿Qué es lo que más echarías de menos de ese lugar si no pudieras volver?' },
-    ],
-    hints: [
-      'Puedes decir: "Mi lugar favorito es..."',
-      'Prueba con: "Me gusta porque..."',
-      'Puedes contar: "Cuando voy allí..."',
-      'Intenta: "Lo mejor de ese sitio es..."',
-      'Puedes decir: "Voy con..."',
-      'Prueba con: "Está en..."',
-      'Puedes contar: "La última vez que fui..."',
-      'Intenta: "Siempre que voy..."',
+      { praise: '¡Ese sitio suena genial!',           q: '¿Qué es lo que más te gusta de ese lugar?' },
+      { praise: '¡Qué buena elección!',               q: '¿Con quién vas normalmente a ese lugar?' },
+      { praise: '¡Me encantaría ir!',                 q: '¿Qué haces cuando estás allí?' },
+      { praise: '¡Qué sitio tan chulo!',              q: '¿Cuándo fue la última vez que fuiste?' },
+      { praise: '¡Eso suena muy bien!',               q: '¿Hay algo que siempre haces cuando vas a ese lugar?' },
+      { praise: '¡Muy bien descrito!',                q: '¿Hay algún otro lugar al que te gustaría ir?' },
+      { praise: '¡Qué bonito debe ser!',              q: '¿Está cerca de tu casa o hay que ir en coche?' },
+      { praise: '¡Genial!',                           q: '¿En qué época del año te gusta más ir?' },
+      { praise: '¡Qué sitio tan especial!',           q: '¿Hay algo especial de ese lugar que siempre recuerdes?' },
+      { praise: '¡Me parece fantástico!',             q: '¿Has ido muchas veces o solo alguna vez?' },
+      { praise: '¡Eso mola mucho!',                   q: '¿Qué es lo primero que haces cuando llegas allí?' },
+      { praise: '¡Qué bien!',                         q: '¿Hay algo que te gustaría cambiar de ese lugar?' },
+      { praise: '¡Suena increíble!',                  q: '¿Prefieres los lugares con mucha gente o tranquilos?' },
+      { praise: '¡Qué interesante!',                  q: '¿Hay algún sitio al que nunca hayas ido pero quieras ir?' },
+      { praise: '¡Muy chulo!',                        q: '¿Hay alguna tienda, parque o sitio especial cerca de allí?' },
+      { praise: '¡Genial!',                           q: '¿Ese lugar es de interior o al aire libre?' },
+      { praise: '¡Qué guay!',                         q: '¿Qué comida o cosa compras cuando vas allí?' },
+      { praise: '¡Estupendo!',                        q: '¿Le recomendarías ese lugar a un amigo?' },
+      { praise: '¡Qué buena descripción!',            q: '¿Hay alguna foto tuya en ese lugar?' },
+      { praise: '¡Maravilloso!',                      q: '¿Qué es lo que más echarías de menos si no pudieras volver?' },
     ],
   },
 };
@@ -515,9 +578,10 @@ const MILESTONES = [
   { words: 18, emoji: '🚀',  title: '¡Superestrella!', msg: '18 palabras. ¡Récord histórico!',    stars: 8 },
 ];
 
+// ── Estado ───────────────────────────────────────────────────────────────────
 let currentTopicKey = null;
+let activeTab = null;
 let responseIndex = 0;
-let hintIndex = 0;
 let sessionResponses = 0;
 let sessionBestWords = 0;
 let sessionStars = 0;
@@ -527,10 +591,10 @@ let totalStars = parseInt(localStorage.getItem('comunicador_stars') || '0');
 
 document.getElementById('total-stars').textContent = totalStars;
 
+// ── Navegación ───────────────────────────────────────────────────────────────
 function selectTopic(key) {
   currentTopicKey = key;
   responseIndex = 0;
-  hintIndex = 0;
   sessionResponses = 0;
   sessionBestWords = 0;
   sessionStars = 0;
@@ -543,6 +607,7 @@ function selectTopic(key) {
   document.getElementById('messages').innerHTML = '';
   updateStats();
   resetMeter();
+  buildWordPanel(topic.wordCategories);
 
   document.getElementById('topic-screen').style.display = 'none';
   document.getElementById('chat-screen').style.display = 'block';
@@ -556,6 +621,58 @@ function goBack() {
   document.getElementById('topic-screen').style.display = 'block';
 }
 
+// ── Panel de palabras ─────────────────────────────────────────────────────────
+function buildWordPanel(categories) {
+  const tabsEl = document.getElementById('word-tabs');
+  const chipsEl = document.getElementById('word-chips');
+  tabsEl.innerHTML = '';
+
+  categories.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = WORD_BANK[cat].label;
+    btn.onclick = () => switchTab(cat);
+    tabsEl.appendChild(btn);
+  });
+
+  activeTab = categories[0];
+  renderChips(activeTab);
+}
+
+function switchTab(cat) {
+  activeTab = cat;
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    const cats = TOPICS[currentTopicKey].wordCategories;
+    btn.classList.toggle('active', cats[i] === cat);
+  });
+  renderChips(cat);
+}
+
+function renderChips(cat) {
+  const chipsEl = document.getElementById('word-chips');
+  chipsEl.innerHTML = '';
+  WORD_BANK[cat].words.forEach(word => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.textContent = word;
+    chip.onclick = () => insertWord(word);
+    chipsEl.appendChild(chip);
+  });
+}
+
+function insertWord(word) {
+  const ta = document.getElementById('user-input');
+  const cur = ta.value;
+  const needsSpace = cur.length > 0 && !cur.endsWith(' ');
+  ta.value = cur + (needsSpace ? ' ' : '') + word + ' ';
+  ta.focus();
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  updateMeter(countWords(ta.value));
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ── Input ─────────────────────────────────────────────────────────────────────
 function onInput() {
   const ta = document.getElementById('user-input');
   ta.style.height = 'auto';
@@ -568,10 +685,20 @@ function onKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
+function clearInput() {
+  const ta = document.getElementById('user-input');
+  ta.value = '';
+  ta.style.height = 'auto';
+  updateMeter(0);
+  document.getElementById('send-btn').disabled = true;
+  ta.focus();
+}
+
 function countWords(text) {
   return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
 }
 
+// ── Medidor ───────────────────────────────────────────────────────────────────
 function updateMeter(words) {
   document.getElementById('word-count').textContent = words;
   document.getElementById('progress-fill').style.width = Math.min(words / 20 * 100, 100) + '%';
@@ -588,6 +715,7 @@ function resetMeter() {
   document.getElementById('send-btn').disabled = true;
 }
 
+// ── Mensajes ──────────────────────────────────────────────────────────────────
 function addMessage(text, type) {
   const div = document.createElement('div');
   div.className = 'msg ' + type;
@@ -597,6 +725,7 @@ function addMessage(text, type) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
+// ── Enviar ────────────────────────────────────────────────────────────────────
 function sendMessage() {
   const ta = document.getElementById('user-input');
   const text = ta.value.trim();
@@ -621,14 +750,7 @@ function sendMessage() {
   }, 600);
 }
 
-function showHint() {
-  const topic = TOPICS[currentTopicKey];
-  const hint = topic.hints[hintIndex % topic.hints.length];
-  hintIndex++;
-  addMessage('💡 ' + hint, 'system');
-  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-}
-
+// ── Hitos ─────────────────────────────────────────────────────────────────────
 function checkMilestones(words) {
   MILESTONES.forEach(m => {
     if (words >= m.words && !reachedMilestones.has(m.words)) {
@@ -656,6 +778,7 @@ function closePopup() {
   showNextPopup();
 }
 
+// ── Stats ─────────────────────────────────────────────────────────────────────
 function updateStats() {
   document.getElementById('stat-responses').textContent = sessionResponses;
   document.getElementById('stat-best').textContent = sessionBestWords;
