@@ -673,47 +673,194 @@ function goBack() {
   document.getElementById('topic-screen').style.display = 'block';
 }
 
+// ── Motor de sugerencias inteligentes ────────────────────────────────────────
+
+// Patrones: última(s) palabra(s) → siguientes sugerencias
+const NEXT_PATTERNS = {
+  // Inicio de frase
+  '':           ['yo', 'hoy', 'ayer', 'primero', 'me gusta', 'quiero', 'estoy', 'fui'],
+  // Pronombres / sujetos
+  'yo':         ['he', 'quiero', 'estoy', 'fui', 'me gusta', 'tengo', 'voy', 'soy'],
+  'mi madre':   ['ha', 'dice', 'me ha', 'me lleva', 'hace', 'también'],
+  'mi padre':   ['ha', 'dice', 'me ha', 'me lleva', 'hace', 'también'],
+  'mis amigos': ['y yo', 'han', 'jugamos', 'vimos', 'fuimos'],
+  // Auxiliares
+  'he':         ['comido', 'jugado', 'visto', 'estado', 'hablado', 'ido', 'hecho', 'aprendido', 'trabajado'],
+  'ha':         ['sido', 'estado', 'pasado', 'ido', 'gustado'],
+  'hemos':      ['jugado', 'practicado', 'comido', 'visto', 'ido', 'hecho'],
+  'he estado':  ['en casa', 'en el cole', 'en el parque', 'en Dima', 'en Encajales', 'en Logos', 'en la Asociación'],
+  'he ido':     ['al cole', 'al parque', 'a Dima', 'a Encajales', 'a Logos', 'a la Asociación'],
+  // Estados
+  'estoy':      ['bien', 'contento', 'feliz', 'cansado', 'emocionado', 'nervioso', 'aburrido', 'tranquilo'],
+  'me siento':  ['bien', 'contento', 'feliz', 'cansado', 'emocionado', 'nervioso', 'triste'],
+  // Gustos
+  'me gusta':   ['mucho', 'porque', 'cuando', 'jugar', 'ver', 'comer', 'escuchar'],
+  'me encanta': ['porque', 'mucho', 'cuando', 'jugar', 'ver', 'comer'],
+  'no me gusta':['porque', 'cuando', 'nada', 'mucho'],
+  'quiero':     ['jugar', 'ver', 'comer', 'ir', 'hablar', 'aprender', 'repetir'],
+  // Conectores temporales
+  'primero':    ['he', 'fui', 'comí', 'jugué', 'vi', 'estuve', 'hablé'],
+  'luego':      ['he', 'fui', 'comí', 'jugué', 'vi', 'estuve', 'también'],
+  'después':    ['he', 'fui', 'comí', 'jugué', 'vi', 'estuve', 'también'],
+  'hoy':        ['he', 'fui', 'estoy', 'tengo', 'hay', 'toca', 'ha sido'],
+  'ayer':       ['fui', 'estuve', 'comí', 'jugué', 'vi', 'fue'],
+  'mañana':     ['voy', 'tengo', 'hay', 'toca', 'quiero'],
+  // Lugar / compañía
+  'con':        ['mis amigos', 'mi madre', 'mi padre', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
+  'en':         ['casa', 'el cole', 'el parque', 'el patio', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'el restaurante'],
+  'fui':        ['a casa', 'al cole', 'al parque', 'a Dima', 'a Encajales', 'con mis amigos', 'solo'],
+  // Causa
+  'porque':     ['me gusta', 'es divertido', 'es chulo', 'es fácil', 'mola mucho', 'me lo paso bien', 'es mi favorito'],
+  'pero':       ['no me gusta', 'es difícil', 'también', 'a veces', 'luego'],
+  // Calificativos
+  'muy':        ['bien', 'mal', 'chulo', 'divertido', 'difícil', 'fácil', 'rico', 'contento', 'cansado'],
+  'mucho':      ['porque', 'y también', 'pero', 'siempre'],
+  'ha sido':    ['divertido', 'difícil', 'fácil', 'chulo', 'genial', 'aburrido', 'bien', 'increíble'],
+  // Terapias
+  'en dima':      ['con Candela', 'he trabajado', 'hemos jugado', 'ha sido divertido', 'ha sido difícil'],
+  'en encajales': ['con Elena', 'he trabajado', 'hemos practicado', 'ha sido divertido', 'ha sido difícil'],
+  'en logos':     ['con Lucía', 'he trabajado', 'hemos practicado', 'ha sido bien', 'ha sido difícil'],
+  'con candela':  ['hemos jugado', 'hemos practicado', 'ha sido divertido', 'lo he hecho bien'],
+  'con elena':    ['hemos jugado', 'hemos practicado', 'ha sido divertido', 'lo he hecho bien'],
+  'con lucía':    ['hemos practicado', 'hemos jugado', 'ha sido bien', 'lo he hecho bien'],
+};
+
+let currentCategories = [];
+let manualTab = null; // si el usuario cambia de pestaña manualmente, no sobreescribir
+
 function buildWordPanel(categories) {
+  currentCategories = categories;
+  manualTab = null;
   const tabsEl = document.getElementById('word-tabs');
   tabsEl.innerHTML = '';
-  categories.forEach((cat, i) => {
+
+  // Pestaña de sugerencias inteligentes (siempre primera)
+  const sugBtn = document.createElement('button');
+  sugBtn.className = 'tab-btn active';
+  sugBtn.id = 'tab-suggestions';
+  sugBtn.textContent = '💡 Sugerencias';
+  sugBtn.onclick = () => { manualTab = null; updateSuggestions(); setActiveTab(sugBtn); };
+  tabsEl.appendChild(sugBtn);
+
+  categories.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.className = 'tab-btn';
     btn.textContent = WORD_BANK[cat].label;
-    btn.onclick = () => switchTab(cat, btn);
+    btn.onclick = () => { manualTab = cat; renderChips(cat); setActiveTab(btn); };
     tabsEl.appendChild(btn);
   });
-  renderChips(categories[0]);
+
+  updateSuggestions();
 }
 
-function switchTab(cat, clickedBtn) {
+function setActiveTab(activeBtn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  clickedBtn.classList.add('active');
-  renderChips(cat);
+  activeBtn.classList.add('active');
 }
 
 function renderChips(cat) {
   const chipsEl = document.getElementById('word-chips');
   chipsEl.innerHTML = '';
-  WORD_BANK[cat].words.forEach(word => {
-    const chip = document.createElement('button');
-    chip.className = 'chip';
-    chip.textContent = word;
-    chip.onclick = () => insertWord(word);
-    chipsEl.appendChild(chip);
-  });
+  WORD_BANK[cat].words.forEach(word => addChip(word, chipsEl));
+}
+
+function addChip(word, container) {
+  const chip = document.createElement('button');
+  chip.className = 'chip';
+  chip.textContent = word;
+  chip.onclick = () => insertWord(word);
+  container.appendChild(chip);
+}
+
+function updateSuggestions() {
+  if (manualTab) return; // el usuario eligió pestaña manual, no interferir
+
+  const ta = document.getElementById('user-input');
+  const text = ta.value;
+  const suggestions = getSuggestions(text);
+
+  const chipsEl = document.getElementById('word-chips');
+  chipsEl.innerHTML = '';
+  suggestions.forEach(w => addChip(w, chipsEl));
+}
+
+function getSuggestions(text) {
+  const lower = text.toLowerCase();
+  const endsWithSpace = text.endsWith(' ');
+  const words = lower.trimEnd().split(/\s+/).filter(Boolean);
+  const lastWord = words[words.length - 1] || '';
+  const last2 = words.slice(-2).join(' ');
+  const last3 = words.slice(-3).join(' ');
+
+  let suggestions = [];
+
+  if (!endsWithSpace && lastWord.length >= 2) {
+    // Autocompletar: el usuario está escribiendo → buscar palabras que empiecen igual
+    const allWords = getAllWords();
+    const completions = allWords.filter(w =>
+      w.toLowerCase().startsWith(lastWord) && w.toLowerCase() !== lastWord
+    );
+    suggestions.push(...completions.slice(0, 6));
+  }
+
+  // Buscar patrón por las últimas palabras (más específico primero)
+  const patternMatch =
+    NEXT_PATTERNS[last3] ||
+    NEXT_PATTERNS[last2] ||
+    NEXT_PATTERNS[lastWord] ||
+    (endsWithSpace || !lastWord ? NEXT_PATTERNS[''] : null);
+
+  if (patternMatch) {
+    patternMatch.forEach(w => {
+      if (!suggestions.includes(w)) suggestions.push(w);
+    });
+  }
+
+  // Completar con palabras del tema actual hasta tener ~10 sugerencias
+  if (suggestions.length < 10 && currentTopicKey) {
+    const topicCat = currentCategories[currentCategories.length - 1];
+    if (topicCat && WORD_BANK[topicCat]) {
+      WORD_BANK[topicCat].words.forEach(w => {
+        if (suggestions.length < 12 && !suggestions.includes(w)) suggestions.push(w);
+      });
+    }
+  }
+
+  // Si aún hay poco, añadir conectores comunes
+  if (suggestions.length < 8) {
+    WORD_BANK['comunes'].words.forEach(w => {
+      if (!suggestions.includes(w)) suggestions.push(w);
+    });
+  }
+
+  return suggestions.slice(0, 14);
+}
+
+function getAllWords() {
+  const all = new Set();
+  Object.values(WORD_BANK).forEach(cat => cat.words.forEach(w => all.add(w)));
+  return [...all];
 }
 
 function insertWord(word) {
   const ta = document.getElementById('user-input');
-  const cur = ta.value;
-  const needsSpace = cur.length > 0 && !cur.endsWith(' ');
-  ta.value = cur + (needsSpace ? ' ' : '') + word + ' ';
+  let cur = ta.value;
+
+  // Si el usuario está a mitad de escribir una palabra, reemplazarla
+  if (!cur.endsWith(' ') && cur.trim()) {
+    const lastSpaceIdx = cur.lastIndexOf(' ');
+    cur = lastSpaceIdx >= 0 ? cur.slice(0, lastSpaceIdx + 1) : '';
+  }
+
+  ta.value = cur + word + ' ';
   ta.focus();
   ta.style.height = 'auto';
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   updateMeter(countWords(ta.value));
   document.getElementById('send-btn').disabled = false;
+
+  // Actualizar sugerencias tras insertar
+  if (!manualTab) updateSuggestions();
 }
 
 function onInput() {
@@ -722,6 +869,13 @@ function onInput() {
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   updateMeter(countWords(ta.value));
   document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
+
+  // Volver a sugerencias automáticas si no hay tab manual
+  if (!manualTab) {
+    const sugBtn = document.getElementById('tab-suggestions');
+    if (sugBtn) setActiveTab(sugBtn);
+    updateSuggestions();
+  }
 }
 
 function onKey(e) {
@@ -738,6 +892,7 @@ function undoWord() {
   updateMeter(countWords(ta.value));
   document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
   ta.focus();
+  if (!manualTab) updateSuggestions();
 }
 
 function speakText() {
@@ -804,6 +959,7 @@ function sendMessage() {
   if (!text) return;
 
   stopSpeaking();
+  manualTab = null;
   const words = countWords(text);
   checkMilestones(words);
 
