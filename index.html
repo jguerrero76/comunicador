@@ -170,12 +170,29 @@
     .speak-btn.speaking { animation: pulse 0.8s infinite; }
     @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 
+    .mic-btn {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #065f46;
+      border: 2px solid #6ee7b7; border-radius: 16px; width: 52px; height: 52px;
+      font-size: 1.3rem; cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+    }
+    .mic-btn:hover { background: linear-gradient(135deg, #6ee7b7, #34d399); color: #fff; }
+    .mic-btn.listening { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border-color: #ef4444; animation: pulse 0.7s infinite; }
+    .mic-btn.no-support { opacity: 0.35; cursor: not-allowed; }
+
     .undo-btn {
       background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d;
       border: 2px solid #f9a8d4; border-radius: 16px; width: 52px; height: 52px;
       font-size: 1.1rem; cursor: pointer; transition: all 0.18s; flex-shrink: 0; font-weight: 800;
     }
     .undo-btn:hover { background: linear-gradient(135deg, #fda4af, #fb7185); color: #fff; border-color: #fb7185; }
+
+    .save-btn {
+      background: linear-gradient(135deg, #fef9c3, #fef08a); color: #854d0e;
+      border: 2px solid #fbbf24; border-radius: 16px; width: 52px; height: 52px;
+      font-size: 1.3rem; cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+    }
+    .save-btn:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+    .save-btn.saved { animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
 
     /* ── Stats ── */
     .stats-bar { display: flex; justify-content: space-around; background: var(--card); border-radius: var(--radius); padding: 12px 8px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); gap: 4px; }
@@ -271,8 +288,10 @@
       <textarea id="user-input" placeholder="Escribe aquí o toca las palabras de arriba..." rows="1"
         oninput="onInput()" onkeydown="onKey(event)"></textarea>
     </div>
+    <button class="mic-btn" onclick="toggleVoice()" id="mic-btn" title="Hablar">🎤</button>
     <button class="undo-btn" onclick="undoWord()" title="Borrar última palabra">⌫</button>
     <button class="speak-btn" onclick="speakText()" id="speak-btn" title="Escuchar frase">🔊</button>
+    <button class="save-btn" onclick="savePhrase()" id="save-btn" title="Guardar frase">⭐</button>
     <button class="send-btn" onclick="sendMessage()" id="send-btn" disabled>➤</button>
   </div>
 
@@ -280,6 +299,19 @@
     <div class="stat"><div class="val" id="stat-responses">0</div><div class="lbl">Respuestas</div></div>
     <div class="stat"><div class="val" id="stat-best">0</div><div class="lbl">Mejor frase</div></div>
     <div class="stat"><div class="val" id="stat-stars">0</div><div class="lbl">⭐ Sesión</div></div>
+    <div class="stat" onclick="showSaved()" style="cursor:pointer"><div class="val" id="stat-saved">0</div><div class="lbl">💾 Guardadas</div></div>
+  </div>
+</div>
+
+<!-- Modal frases guardadas -->
+<div id="saved-modal" style="display:none;position:fixed;inset:0;background:rgba(30,27,75,0.5);z-index:200;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:24px;padding:28px 24px;max-width:400px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(124,58,237,0.3);border:3px solid #a78bfa;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-size:1.2rem;font-weight:900;color:#7c3aed;">⭐ Frases guardadas</h3>
+      <button onclick="closeSaved()" style="background:#f3f4f6;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:700;color:#6b7280;">✕</button>
+    </div>
+    <div id="saved-list"></div>
+    <p id="saved-empty" style="color:#9ca3af;text-align:center;font-size:0.9rem;padding:20px 0;">Aún no hay frases guardadas.<br>Escribe una frase y pulsa ⭐</p>
   </div>
 </div>
 
@@ -640,8 +672,169 @@ let pendingPopups = [];
 let totalStars = parseInt(localStorage.getItem('comunicador_stars') || '0');
 let synth = window.speechSynthesis;
 let speaking = false;
+let recognition = null;
+let isListening = false;
+let savedPhrases = JSON.parse(localStorage.getItem('comunicador_saved') || '[]');
+let recentWords = JSON.parse(localStorage.getItem('comunicador_recent') || '[]');
+const audioCtx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 
 document.getElementById('total-stars').textContent = totalStars;
+updateSavedCount();
+
+// ── Voz (reconocimiento) ─────────────────────────────────────────────────────
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-ES';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    const ta = document.getElementById('user-input');
+    ta.value = transcript;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+    updateMeter(countWords(ta.value));
+    document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
+    if (!manualTab) updateSuggestions();
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    const btn = document.getElementById('mic-btn');
+    btn.textContent = '🎤';
+    btn.classList.remove('listening');
+  };
+
+  recognition.onerror = () => {
+    isListening = false;
+    const btn = document.getElementById('mic-btn');
+    btn.textContent = '🎤';
+    btn.classList.remove('listening');
+  };
+} else {
+  setTimeout(() => {
+    const btn = document.getElementById('mic-btn');
+    if (btn) btn.classList.add('no-support');
+  }, 100);
+}
+
+function toggleVoice() {
+  if (!recognition) return;
+  if (isListening) {
+    recognition.stop();
+  } else {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    recognition.start();
+    isListening = true;
+    const btn = document.getElementById('mic-btn');
+    btn.textContent = '⏹';
+    btn.classList.add('listening');
+  }
+}
+
+// ── Frases guardadas ──────────────────────────────────────────────────────────
+function savePhrase() {
+  const text = document.getElementById('user-input').value.trim();
+  if (!text) return;
+  if (!savedPhrases.includes(text)) {
+    savedPhrases.unshift(text);
+    if (savedPhrases.length > 30) savedPhrases.pop();
+    localStorage.setItem('comunicador_saved', JSON.stringify(savedPhrases));
+  }
+  updateSavedCount();
+  const btn = document.getElementById('save-btn');
+  btn.classList.add('saved');
+  setTimeout(() => btn.classList.remove('saved'), 400);
+}
+
+function updateSavedCount() {
+  const el = document.getElementById('stat-saved');
+  if (el) el.textContent = savedPhrases.length;
+}
+
+function showSaved() {
+  const modal = document.getElementById('saved-modal');
+  const list = document.getElementById('saved-list');
+  const empty = document.getElementById('saved-empty');
+  list.innerHTML = '';
+  modal.style.display = 'flex';
+
+  if (savedPhrases.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  savedPhrases.forEach((phrase, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+
+    const useBtn = document.createElement('button');
+    useBtn.textContent = phrase;
+    useBtn.style.cssText = 'flex:1;text-align:left;background:linear-gradient(135deg,#ede9fe,#ddd6fe);border:1.5px solid #c4b5fd;border-radius:12px;padding:10px 14px;cursor:pointer;font-size:0.9rem;font-weight:600;color:#4c1d95;transition:all 0.15s;';
+    useBtn.onmouseenter = () => useBtn.style.background = 'linear-gradient(135deg,#7c3aed,#6d28d9)';
+    useBtn.onmouseleave = () => useBtn.style.background = 'linear-gradient(135deg,#ede9fe,#ddd6fe)';
+    useBtn.onclick = () => { useSavedPhrase(phrase); closeSaved(); };
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '🗑';
+    delBtn.style.cssText = 'background:#fee2e2;border:1.5px solid #fca5a5;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:0.9rem;';
+    delBtn.onclick = () => { savedPhrases.splice(i, 1); localStorage.setItem('comunicador_saved', JSON.stringify(savedPhrases)); updateSavedCount(); showSaved(); };
+
+    row.appendChild(useBtn);
+    row.appendChild(delBtn);
+    list.appendChild(row);
+  });
+}
+
+function closeSaved() {
+  document.getElementById('saved-modal').style.display = 'none';
+}
+
+function useSavedPhrase(phrase) {
+  if (!currentTopicKey) return;
+  const ta = document.getElementById('user-input');
+  ta.value = phrase + ' ';
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  updateMeter(countWords(ta.value));
+  document.getElementById('send-btn').disabled = false;
+  if (!manualTab) updateSuggestions();
+}
+
+// ── Palabras recientes ────────────────────────────────────────────────────────
+function trackRecentWords(text) {
+  const words = text.trim().split(/\s+/).filter(w => w.length > 2);
+  words.forEach(w => {
+    recentWords = recentWords.filter(r => r !== w);
+    recentWords.unshift(w);
+  });
+  recentWords = recentWords.slice(0, 20);
+  localStorage.setItem('comunicador_recent', JSON.stringify(recentWords));
+}
+
+// ── Sonido en hitos ───────────────────────────────────────────────────────────
+function playMilestoneSound(stars) {
+  if (!audioCtx) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const notes = stars <= 2 ? [523, 659] : stars <= 3 ? [523, 659, 784] : [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    const t = audioCtx.currentTime + i * 0.12;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.18, t + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc.start(t);
+    osc.stop(t + 0.3);
+  });
+}
 
 function selectTopic(key) {
   currentTopicKey = key;
@@ -816,6 +1009,13 @@ function getSuggestions(text) {
     });
   }
 
+  // Añadir palabras recientes si hay hueco y encajan
+  if (recentWords.length > 0 && endsWithSpace) {
+    recentWords.forEach(w => {
+      if (suggestions.length < 10 && !suggestions.includes(w)) suggestions.push(w);
+    });
+  }
+
   // Completar con palabras del tema actual hasta tener ~10 sugerencias
   if (suggestions.length < 10 && currentTopicKey) {
     const topicCat = currentCategories[currentCategories.length - 1];
@@ -964,6 +1164,7 @@ function sendMessage() {
   checkMilestones(words);
 
   addMessage(text, 'user');
+  trackRecentWords(text);
   sessionResponses++;
   if (words > sessionBestWords) sessionBestWords = words;
   updateStats();
@@ -988,6 +1189,7 @@ function checkMilestones(words) {
       localStorage.setItem('comunicador_stars', totalStars);
       document.getElementById('total-stars').textContent = totalStars;
       pendingPopups.push(m);
+      playMilestoneSound(m.stars);
     }
   });
 }
