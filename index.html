@@ -35,15 +35,19 @@
     }
     header p { color: #94A3B8; font-size: 0.95rem; margin-top: 4px; }
     .stars-bar {
-      display: inline-flex; align-items: center; gap: 8px; margin-top: 10px;
+      display: inline-flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 12px;
       font-size: 1rem; font-weight: 800;
-      background: #FFF7ED;
-      border: 2px solid #FED7AA; border-radius: 99px; padding: 6px 18px; color: #9A3412;
+      background: #1E293B;
+      border: 2px solid #334155; border-radius: 18px; padding: 10px 24px; color: #F8FAFC;
     }
+    .stars-bar-top { display: flex; align-items: center; gap: 8px; }
+    .stars-goal { font-size: 0.75rem; font-weight: 700; color: #94A3B8; }
+    .stars-progress-track { width: 160px; height: 8px; background: #334155; border-radius: 99px; overflow: hidden; }
+    .stars-progress-fill { height: 100%; background: linear-gradient(90deg, #F97316, #FDBA74); border-radius: 99px; transition: width 0.5s cubic-bezier(0.34,1.4,0.64,1); }
 
     /* ── Selector de temas ── */
     #topic-screen { max-width: 900px; margin: 0 auto; }
-    #topic-screen h2 { text-align: center; margin-bottom: 20px; font-size: 1.25rem; font-weight: 800; color: var(--text); }
+    #topic-screen h2 { text-align: center; margin-bottom: 20px; font-size: 1.25rem; font-weight: 800; color: #F8FAFC; }
     .topics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     @media (min-width: 540px) { .topics-grid { grid-template-columns: repeat(4, 1fr); } }
     @media (min-width: 720px) { .topics-grid { grid-template-columns: repeat(5, 1fr); } }
@@ -215,8 +219,8 @@
     }
 
     /* ── Admin ── */
-    .admin-btn { position:absolute; top:18px; right:16px; background:#FFF7ED; border:2px solid #FED7AA; border-radius:10px; padding:7px 12px; font-size:0.82rem; font-weight:800; color:#EA580C; cursor:pointer; transition:all 0.15s; z-index:10; }
-    .admin-btn:hover { background:#FFEDD5; transform:scale(1.05); }
+    .admin-btn { position:absolute; top:18px; right:16px; background:#1E293B; border:2px solid #334155; border-radius:10px; padding:7px 12px; font-size:0.82rem; font-weight:800; color:#94A3B8; cursor:pointer; transition:all 0.15s; z-index:10; }
+    .admin-btn:hover { background:#F97316; border-color:#F97316; color:#fff; transform:scale(1.05); }
     header { position:relative; }
 
     @media (max-width: 480px) {
@@ -225,7 +229,8 @@
       header { padding: 10px 0 8px; }
       header h1 { font-size: 1.65rem; }
       header p { font-size: 0.85rem; }
-      .stars-bar { font-size: 0.88rem; padding: 5px 14px; }
+      .stars-bar { font-size: 0.88rem; padding: 8px 16px; }
+      .stars-progress-track { width: 120px; }
 
       .topics-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .topic-btn { padding: 14px 6px; }
@@ -275,7 +280,11 @@
   <button class="admin-btn" onclick="openAdmin()">⚙️ Admin</button>
   <h1>💬 Comunicador</h1>
   <p>Hablemos juntos</p>
-  <div class="stars-bar">⭐ <span id="total-stars">0</span> estrellas totales</div>
+  <div class="stars-bar">
+    <div class="stars-bar-top">⭐ <span id="total-stars">0</span> / 50 estrellas</div>
+    <div class="stars-progress-track"><div class="stars-progress-fill" id="stars-progress-fill" style="width:0%"></div></div>
+    <div class="stars-goal" id="stars-goal-text">¡Consigue 50 para el gran premio!</div>
+  </div>
 </header>
 
 <div id="topic-screen">
@@ -737,7 +746,7 @@ let savedPhrases = JSON.parse(localStorage.getItem('comunicador_saved') || '[]')
 let recentWords = JSON.parse(localStorage.getItem('comunicador_recent') || '[]');
 const audioCtx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 
-document.getElementById('total-stars').textContent = totalStars;
+updateStarsDisplay();
 updateSavedCount();
 
 // ── Voz (reconocimiento) ─────────────────────────────────────────────────────
@@ -807,6 +816,22 @@ function savePhrase() {
   const btn = document.getElementById('save-btn');
   btn.classList.add('saved');
   setTimeout(() => btn.classList.remove('saved'), 400);
+}
+
+const STAR_GOAL = 50;
+function updateStarsDisplay() {
+  document.getElementById('total-stars').textContent = totalStars;
+  const pct = Math.min(100, Math.round((totalStars / STAR_GOAL) * 100));
+  document.getElementById('stars-progress-fill').style.width = pct + '%';
+  const goalEl = document.getElementById('stars-goal-text');
+  if (totalStars >= STAR_GOAL) {
+    goalEl.textContent = '🏆 ¡Premio conseguido! ¡Eres un campeón!';
+    goalEl.style.color = '#F97316';
+  } else {
+    const left = STAR_GOAL - totalStars;
+    goalEl.textContent = left <= 5 ? `¡Solo ${left} más para el gran premio! 🔥` : `¡${left} estrellas para el gran premio!`;
+    goalEl.style.color = '';
+  }
 }
 
 function updateSavedCount() {
@@ -2008,17 +2033,23 @@ function sendMessage() {
 }
 
 function checkMilestones(words) {
+  const prevTotal = totalStars;
   MILESTONES.forEach(m => {
     if (words >= m.words && !reachedMilestones.has(m.words)) {
       reachedMilestones.add(m.words);
       sessionStars += m.stars;
       totalStars += m.stars;
       localStorage.setItem('comunicador_stars', totalStars);
-      document.getElementById('total-stars').textContent = totalStars;
+      updateStarsDisplay();
       pendingPopups.push(m);
       playMilestoneSound(m.stars);
     }
   });
+  if (prevTotal < STAR_GOAL && totalStars >= STAR_GOAL) {
+    pendingPopups.push({ emoji: '🏆', title: '¡50 ESTRELLAS!', msg: '¡Gonzalo, eres un campeón! ¡Has conseguido el gran premio! 🎉', stars: 0 });
+    launchConfetti(); launchConfetti();
+    setTimeout(launchConfetti, 400);
+  }
 }
 
 function showNextPopup() {
