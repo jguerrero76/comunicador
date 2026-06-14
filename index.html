@@ -98,6 +98,12 @@
     .milestone { font-size: 0.7rem; color: #FDBA74; text-align: center; flex: 1; font-weight: 700; }
     .milestone.reached { color: #22C55E; }
 
+    /* ── Respuestas rápidas ── */
+    .quick-replies { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+    .quick-reply-chip { background: #1E293B; border: 2px solid #334155; border-radius: 20px; padding: 7px 14px; font-size: 0.85rem; font-weight: 800; color: #E2E8F0; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .quick-reply-chip:hover { background: #F97316; border-color: #F97316; color: #fff; transform: scale(1.06); }
+    .quick-reply-chip:active { transform: scale(0.95); }
+
     /* ── Panel de palabras ── */
     .word-panel { background: var(--card); border-radius: 16px; padding: 10px 12px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E7E5E4; }
     .word-panel-tabs { display: flex; gap: 6px; margin-bottom: 9px; overflow-x: auto; scrollbar-width: none; }
@@ -142,12 +148,15 @@
     }
     .sentence-chips.filled { border: 2.5px solid #F97316; background: #FFF7ED; }
     .sentence-chip {
-      display: inline-flex; align-items: center; border-radius: 20px; padding: 5px 13px;
+      display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 5px 10px 5px 13px;
       font-size: 0.93rem; font-weight: 800; color: #fff;
       animation: chipIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
       white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      background: #F97316;
+      background: #F97316; cursor: pointer; border: none;
+      transition: filter 0.12s, transform 0.12s;
     }
+    .sentence-chip:hover { filter: brightness(0.85); transform: scale(0.95); }
+    .sentence-chip .chip-x { font-size: 0.7rem; opacity: 0.7; }
     @keyframes chipIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .sentence-placeholder {
       color: #FDBA74; font-size: 0.88rem; font-style: italic; font-weight: 600;
@@ -355,6 +364,16 @@
         <span class="btn-icon">➤</span><span class="btn-lbl">Enviar</span>
       </button>
     </div>
+  </div>
+
+  <div class="quick-replies" id="quick-replies">
+    <button class="quick-reply-chip" onclick="quickSend('sí')">✅ Sí</button>
+    <button class="quick-reply-chip" onclick="quickSend('no')">❌ No</button>
+    <button class="quick-reply-chip" onclick="quickSend('bien')">😊 Bien</button>
+    <button class="quick-reply-chip" onclick="quickSend('mal')">😞 Mal</button>
+    <button class="quick-reply-chip" onclick="quickSend('no sé')">🤷 No sé</button>
+    <button class="quick-reply-chip" onclick="quickSend('genial')">👍 Genial</button>
+    <button class="quick-reply-chip" onclick="quickSend('más o menos')">🙄 Más o menos</button>
   </div>
 
   <div class="word-panel">
@@ -942,8 +961,19 @@ function selectTopic(key) {
   document.getElementById('topic-screen').style.display = 'none';
   document.getElementById('chat-screen').style.display = 'block';
 
-  addMessage(topic.starter, 'ai');
+  addMessage(getTopicStarter(currentTopicKey, topic), 'ai');
   document.getElementById('user-input').focus();
+}
+
+function getTopicStarter(key, topic) {
+  if (key === 'dia') {
+    const h = new Date().getHours();
+    if (h < 12) return '¡Buenos días, Gonzalo! ¿Cómo llevas la mañana?';
+    if (h < 15) return '¡Hola Gonzalo! ¿Cómo ha ido la mañana? Cuéntame.';
+    if (h < 21) return '¡Buenas tardes, Gonzalo! Cuéntame, ¿cómo ha sido tu día hoy?';
+    return '¡Buenas noches, Gonzalo! ¿Cómo ha ido el día de hoy?';
+  }
+  return topic.starter;
 }
 
 function goBack() {
@@ -1256,7 +1286,7 @@ function addChip(word, container, color) {
   const col = color || '#F97316';
   chip.style.cssText = `border-color:${col}44;border-top:3px solid ${col};`;
   chip.innerHTML = `<img class="chip-picto loading" src="" alt="${word}" aria-hidden="true"><span style="color:${col}cc;">${word}</span>`;
-  chip.onclick = () => insertWord(word);
+  chip.onclick = () => { insertWord(word); speakWordBrief(word); };
   container.appendChild(chip);
   loadPictoInChip(chip, word).catch(() => {
     const img = chip.querySelector('.chip-picto');
@@ -1377,7 +1407,6 @@ function insertWord(word) {
   const ta = document.getElementById('user-input');
   let cur = ta.value;
 
-  // Si el usuario está a mitad de escribir una palabra, reemplazarla
   if (!cur.endsWith(' ') && cur.trim()) {
     const lastSpaceIdx = cur.lastIndexOf(' ');
     cur = lastSpaceIdx >= 0 ? cur.slice(0, lastSpaceIdx + 1) : '';
@@ -1390,9 +1419,41 @@ function insertWord(word) {
   updateMeter(countWords(ta.value));
   updateSentenceChips();
   document.getElementById('send-btn').disabled = false;
-
-  // Actualizar sugerencias tras insertar
+  if (navigator.vibrate) navigator.vibrate(22);
   if (!manualTab) updateSuggestions();
+}
+
+function speakWordBrief(word) {
+  if (!synth) return;
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'es-ES'; u.rate = 1.0; u.volume = 0.75;
+  const v = getBestSpanishVoice(); if (v) u.voice = v;
+  synth.speak(u);
+}
+
+function quickSend(word) {
+  const ta = document.getElementById('user-input');
+  ta.value = word + ' ';
+  updateMeter(countWords(ta.value));
+  updateSentenceChips();
+  document.getElementById('send-btn').disabled = false;
+  if (navigator.vibrate) navigator.vibrate(22);
+  speakWordBrief(word);
+  sendMessage();
+}
+
+function removeWordAt(index) {
+  const ta = document.getElementById('user-input');
+  const words = ta.value.trim().split(/\s+/).filter(Boolean);
+  words.splice(index, 1);
+  ta.value = words.length ? words.join(' ') + ' ' : '';
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  updateMeter(countWords(ta.value));
+  updateSentenceChips();
+  document.getElementById('send-btn').disabled = !ta.value.trim();
+  if (!manualTab) updateSuggestions();
+  if (navigator.vibrate) navigator.vibrate(15);
 }
 
 function onInput() {
@@ -1517,10 +1578,12 @@ function updateSentenceChips() {
     chips.classList.add('filled');
     const COLORS = ['#F97316','#F59E0B','#22C55E','#06B6D4','#8B5CF6','#EC4899'];
     words.forEach((word, i) => {
-      const chip = document.createElement('span');
+      const chip = document.createElement('button');
       chip.className = 'sentence-chip';
       chip.style.background = COLORS[i % COLORS.length];
-      chip.textContent = word;
+      chip.title = 'Toca para borrar esta palabra';
+      chip.innerHTML = `${word}<span class="chip-x">✕</span>`;
+      chip.onclick = () => removeWordAt(i);
       chips.appendChild(chip);
     });
   }
@@ -2043,6 +2106,7 @@ function checkMilestones(words) {
       updateStarsDisplay();
       pendingPopups.push(m);
       playMilestoneSound(m.stars);
+      if (navigator.vibrate) navigator.vibrate([60, 40, 100, 40, 60]);
     }
   });
   if (prevTotal < STAR_GOAL && totalStars >= STAR_GOAL) {
