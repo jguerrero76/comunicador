@@ -158,6 +158,8 @@
     .sentence-chip:hover { filter: brightness(0.85); transform: scale(0.95); }
     .sentence-chip .chip-x { font-size: 0.7rem; opacity: 0.7; }
     @keyframes chipIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+    @keyframes slideDown { from { transform: translateX(-50%) translateY(0); opacity: 1; } to { transform: translateX(-50%) translateY(-20px); opacity: 0; } }
     .sentence-placeholder {
       color: #FDBA74; font-size: 0.88rem; font-style: italic; font-weight: 600;
       align-self: center; padding: 4px 2px;
@@ -486,11 +488,12 @@ const WORD_BANK = {
   },
   musica: {
     label: '🎵 Música',
-    words: ['la canción', 'el grupo', 'el cantante', 'la música',
+    words: ['la canción', 'el grupo', 'el cantante', 'el artista', 'la música',
             'me gusta escuchar', 'suena bien', 'suena mal', 'tiene mucho ritmo',
             'con auriculares', 'en el altavoz', 'bailar', 'cantar',
             'la letra', 'el videoclip', 'en Spotify', 'en YouTube',
-            'es muy pegadiza', 'me pone de buen humor', 'la repito mucho'],
+            'es muy pegadiza', 'me pone de buen humor', 'la repito mucho',
+            'el concierto', 'la banda sonora', 'el remix'],
   },
   cole: {
     label: '🏫 El cole',
@@ -812,13 +815,19 @@ function toggleVoice() {
   if (!recognition) return;
   if (isListening) {
     recognition.stop();
+    const btn = document.getElementById('mic-btn');
+    btn.textContent = '🎤';
+    btn.classList.remove('listening');
   } else {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     recognition.start();
     isListening = true;
     const btn = document.getElementById('mic-btn');
-    btn.textContent = '⏹';
+    btn.innerHTML = '🎤<br><span style="font-size:0.5rem;white-space:nowrap;">Escuchando...</span>';
     btn.classList.add('listening');
+    setTimeout(() => {
+      if (isListening) btn.innerHTML = '🎤<br><span style="font-size:0.5rem;">↻</span>';
+    }, 3000);
   }
 }
 
@@ -1126,7 +1135,8 @@ const EMOJI_MAP = {
   // Música
   'bailar':'💃','cantar':'🎤','en Spotify':'🎵','en YouTube':'▶️',
   'con auriculares':'🎧','en el altavoz':'🔊','la canción':'🎵',
-  'tiene mucho ritmo':'🥁','suena bien':'👍',
+  'tiene mucho ritmo':'🥁','suena bien':'👍','el concierto':'🎪','la banda sonora':'🎬','el remix':'🎛️',
+  'el artista':'🎸','el grupo':'👥','el cantante':'🎤',
   // Cole
   'en clase':'📚','en el recreo':'⚽','en el comedor':'🍽️',
   'mi profe':'👩‍🏫','mis compañeros':'👫','los deberes':'📝',
@@ -1153,7 +1163,7 @@ const CAT_COLORS = {
   lugares:      '#0EA5E9',
   musica:       '#A855F7',
   cole:         '#10B981',
-  deporte:      '#3B82F6',
+  deporte:      '#06B6D4',
 };
 
 // ── Pictogramas ARASAAC ───────────────────────────────────────────────────────
@@ -1488,6 +1498,7 @@ function undoWord() {
   document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
   ta.focus();
   if (!manualTab) updateSuggestions();
+  if (lastSpace >= 0 || trimmed.length > 0) showToast('Palabra eliminada', '⌫');
 }
 
 function getBestSpanishVoice() {
@@ -2134,6 +2145,20 @@ function updateStats() {
   document.getElementById('stat-responses').textContent = sessionResponses;
   document.getElementById('stat-best').textContent = sessionBestWords;
   document.getElementById('stat-stars').textContent = sessionStars;
+  const nextMilestone = MILESTONES.find(m => m.words > sessionBestWords);
+  const bestEl = document.getElementById('stat-best');
+  if (nextMilestone && bestEl) {
+    const prog = sessionBestWords + '/' + nextMilestone.words;
+    bestEl.title = prog + ' palabras → próxima ' + nextMilestone.emoji;
+  }
+}
+
+function showToast(msg, icon = '✓', duration = 2000) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#1E293B;color:#F8FAFC;padding:10px 16px;border-radius:20px;font-weight:700;font-size:0.9rem;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:999;border:2px solid #F97316;animation:slideUp 0.3s ease;`;
+  toast.textContent = icon + ' ' + msg;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.animation = 'slideDown 0.3s ease'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, duration);
 }
 </script>
 </body>
