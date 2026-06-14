@@ -852,8 +852,8 @@ function updateStarsDisplay() {
   document.getElementById('stars-progress-fill').style.width = pct + '%';
   const goalEl = document.getElementById('stars-goal-text');
   if (totalStars >= STAR_GOAL) {
-    goalEl.textContent = '🏆 ¡Premio conseguido! ¡Eres un campeón!';
-    goalEl.style.color = '#F97316';
+    goalEl.textContent = '🏆 Premio: Jugar a la tablet 🎮';
+    goalEl.style.color = '#22C55E';
   } else {
     const left = STAR_GOAL - totalStars;
     goalEl.textContent = left <= 5 ? `¡Solo ${left} más para el gran premio! 🔥` : `¡${left} estrellas para el gran premio!`;
