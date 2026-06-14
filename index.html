@@ -744,6 +744,7 @@ const TOPICS = {
   },
 };
 
+const STAR_GOAL = 50;
 const MILESTONES = [
   { words: 3,  emoji: '⭐',  title: '¡Muy bien!',      msg: '¡3 palabras! Vas genial.',          stars: 1 },
   { words: 5,  emoji: '⭐⭐', title: '¡Estupendo!',     msg: '5 palabras. ¡Eso es hablar!',        stars: 2 },
@@ -846,7 +847,6 @@ function savePhrase() {
   setTimeout(() => btn.classList.remove('saved'), 400);
 }
 
-const STAR_GOAL = 50;
 function updateStarsDisplay() {
   document.getElementById('total-stars').textContent = totalStars;
   const pct = Math.min(100, Math.round((totalStars / STAR_GOAL) * 100));
