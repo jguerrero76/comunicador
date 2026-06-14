@@ -393,7 +393,7 @@ const WORD_BANK = {
   },
   sujetos: {
     label: '👤 Quién',
-    words: ['yo', 'mi familia', 'mis amigos',
+    words: ['yo', 'mamá', 'papá', 'mi familia', 'mis amigos',
             'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli',
             'mi primo Gonzalo', 'el tito Juan', 'el tito Manolo',
             'el tito Rafa', 'la tita Maria', 'la tita María Jesús',
@@ -935,6 +935,8 @@ const NEXT_PATTERNS = {
   '':           ['yo', 'hoy', 'ayer', 'primero', 'me gusta', 'quiero', 'estoy', 'fui'],
   // Pronombres / sujetos
   'yo':         ['he', 'quiero', 'estoy', 'fui', 'me gusta', 'tengo', 'voy', 'soy'],
+  'mamá':       ['ha', 'dice', 'me ha', 'me lleva', 'hace', 'también', 'y yo'],
+  'papá':       ['ha', 'dice', 'me ha', 'me lleva', 'hace', 'también', 'y yo'],
   'mis amigos': ['y yo', 'han', 'jugamos', 'vimos', 'fuimos'],
   // Auxiliares
   'he':         ['comido', 'jugado', 'visto', 'estado', 'hablado', 'ido', 'hecho', 'aprendido', 'trabajado'],
@@ -965,11 +967,11 @@ const NEXT_PATTERNS = {
   'ayer':       ['fui', 'estuve', 'comí', 'jugué', 'vi', 'fue'],
   'mañana':     ['voy', 'tengo', 'hay', 'toca', 'quiero'],
   // Lugar / compañía
-  'con':        ['mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
+  'con':        ['mamá', 'papá', 'mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
   'en':         ['casa', 'el cole', 'el parque', 'el patio', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'el restaurante'],
   'a':          ['casa', 'el parque', 'el cole', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'veces'],
   'al':         ['parque', 'cole', 'restaurante', 'polideportivo', 'final'],
-  'con':        ['mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
+  'con':        ['mamá', 'papá', 'mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
   'de':         ['lo que pasó', 'mis amigos', 'mis juegos', 'mis series', 'eso', 'todo'],
   'para':       ['mañana', 'el cole', 'descansar', 'jugar', 'comer', 'aprender'],
   'por':        ['eso', 'la mañana', 'la tarde', 'favor', 'aquí'],
@@ -1016,7 +1018,7 @@ const NEXT_PATTERNS = {
 
 const EMOJI_MAP = {
   // Quién
-  'yo':'🙋','mi familia':'👨‍👩‍👦','mis amigos':'👫',
+  'yo':'🙋','mamá':'👩','papá':'👨','mi familia':'👨‍👩‍👦','mis amigos':'👫',
   'el abuelo Pepillo':'👴','la abuela Juanita':'👵','la abuela Manoli':'👵',
   'mi primo Gonzalo':'👦','el tito Juan':'👨','el tito Manolo':'👨',
   'el tito Rafa':'👨','la tita Maria':'👩','la tita María Jesús':'👩',
