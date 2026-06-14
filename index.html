@@ -130,7 +130,8 @@
     .tab-btn.active:nth-child(5) { background: #f59e0b; color: #fff; box-shadow: 0 3px 10px rgba(245,158,11,0.4); }
     .tab-btn:hover:not(.active) { transform: scale(1.05); }
     .word-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip { border: 2px solid transparent; border-radius: 20px; padding: 7px 15px; font-size: 0.88rem; cursor: pointer; transition: all 0.15s cubic-bezier(0.34,1.4,0.64,1); font-weight: 700; user-select: none; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; border: 2px solid transparent; border-radius: 20px; padding: 8px 15px; font-size: 0.88rem; cursor: pointer; transition: all 0.15s cubic-bezier(0.34,1.4,0.64,1); font-weight: 700; user-select: none; min-height: 40px; }
+    .chip-emoji { font-size: 1.05em; line-height: 1; flex-shrink: 0; }
     .chip:nth-child(5n+1) { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
     .chip:nth-child(5n+2) { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
     .chip:nth-child(5n+3) { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
@@ -261,6 +262,15 @@
 
     .messages::-webkit-scrollbar { width: 4px; }
     .messages::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 4px; }
+
+    .confetti-piece {
+      position: fixed; pointer-events: none; z-index: 9999;
+      animation: confettiFly var(--dur) ease-out forwards;
+    }
+    @keyframes confettiFly {
+      0%   { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(0); opacity: 0; }
+    }
 
     @keyframes shake {
       0%,100% { transform: translateX(0); }
@@ -1032,6 +1042,69 @@ const NEXT_PATTERNS = {
   'con lucía':    ['hemos practicado', 'hemos jugado', 'ha sido bien', 'lo he hecho bien'],
 };
 
+const EMOJI_MAP = {
+  // Quién
+  'yo':'🙋','mi madre':'👩','mi padre':'👨','mi familia':'👨‍👩‍👦','mis amigos':'👫',
+  'el abuelo Pepillo':'👴','la abuela Juanita':'👵','la abuela Manoli':'👵',
+  'mi primo Gonzalo':'👦','el tito Juan':'👨','el tito Manolo':'👨',
+  'el tito Rafa':'👨','la tita Maria':'👩','la tita María Jesús':'👩',
+  'todos':'👨‍👩‍👧‍👦','solo':'🧍',
+  // Sentimientos
+  'contento':'😊','feliz':'😄','bien':'👍','mal':'👎','cansado':'😴',
+  'aburrido':'😒','emocionado':'🤩','nervioso':'😰','tranquilo':'😌',
+  'enfadado':'😠','triste':'😢','divertido':'😂','genial':'🌟',
+  'increíble':'🚀','chulo':'😎','guay':'🤙',
+  // Conectores
+  'primero':'1️⃣','luego':'2️⃣','después':'3️⃣','porque':'💭','también':'➕',
+  'y':'➕','pero':'🔄','cuando':'⏰','siempre':'♾️','nunca':'🚫',
+  'a veces':'🔀','mucho':'🔝','muy':'⬆️','hoy':'📅','ayer':'📅','mañana':'📅',
+  'me gusta':'❤️','no me gusta':'💔','quiero':'🙋','me encanta':'😍',
+  // Día
+  'en casa':'🏠','en el cole':'🏫','en el parque':'🌳','en el patio':'🏃',
+  'he comido':'🍽️','he jugado':'🎮','he visto':'📺','he estado':'📍',
+  'he hablado':'💬','esta mañana':'🌅','esta tarde':'🌆','esta noche':'🌙',
+  'lo mejor':'🌟','lo peor':'😔','ha sido':'✨','ha pasado':'📖',
+  // Terapias
+  'en Dima':'🏥','en Encajales':'🏥','en Logos':'🏥','en la Asociación':'🏥',
+  'con Candela':'👩‍⚕️','con Elena':'👩‍⚕️','con Lucía':'👩‍⚕️',
+  'he trabajado':'💪','hemos jugado':'🎲','hemos practicado':'📝',
+  'ha sido divertido':'😄','ha sido difícil':'💪','ha sido fácil':'✅',
+  'me ha gustado':'❤️','no me ha gustado':'💔','lo he hecho bien':'🏆',
+  'hoy toca':'📅','ayer fui':'🚗','mañana voy':'🗓️',
+  // Juegos
+  'juego':'🎮','juego a':'🎮','mi personaje':'🦸','el nivel':'⬆️',
+  'ganar':'🏆','perder':'😅','jugar online':'🌐','en la consola':'🎮',
+  'en el móvil':'📱','en el PC':'💻','solo':'🧍','es difícil':'💪',
+  'es fácil':'✅','mola mucho':'🔥','es mi favorito':'⭐',
+  // Series
+  'la serie':'📺','la película':'🎬','el personaje':'🎭','he visto':'👀',
+  'estoy viendo':'📺','quiero ver':'🍿','en Netflix':'🎬','en YouTube':'▶️',
+  'muy emocionante':'🤩','muy divertida':'😂',
+  // Animales
+  'el animal':'🐾','mi mascota':'🐶','puede volar':'🦅','puede nadar':'🐟',
+  'me da miedo':'😨','me encanta':'😍','en el zoo':'🦁',
+  'es grande':'🦣','es pequeño':'🐭','es bonito':'😍','es peligroso':'⚠️',
+  // Comida
+  'mi comida favorita':'🍽️','me gusta comer':'😋','está muy rico':'😋',
+  'de postre':'🍰','para desayunar':'🌅','para comer':'🍽️','para cenar':'🌙',
+  'caliente':'🔥','frío':'🧊','dulce':'🍭','salado':'🧂',
+  // Lugares
+  'al aire libre':'🌿','en verano':'☀️','en invierno':'❄️',
+  'está cerca':'📍','está lejos':'✈️','mi lugar favorito':'❤️',
+  // Música
+  'bailar':'💃','cantar':'🎤','en Spotify':'🎵','en YouTube':'▶️',
+  'con auriculares':'🎧','en el altavoz':'🔊','la canción':'🎵',
+  'tiene mucho ritmo':'🥁','suena bien':'👍',
+  // Cole
+  'en clase':'📚','en el recreo':'⚽','en el comedor':'🍽️',
+  'mi profe':'👩‍🏫','mis compañeros':'👫','los deberes':'📝',
+  'hoy no hay cole':'🎉','me lo he pasado bien':'😄',
+  // Deporte
+  'jugar al fútbol':'⚽','nadar':'🏊','correr':'🏃','montar en bici':'🚴',
+  'el partido':'⚽','marcar un gol':'⚽','empatar':'🤝',
+  'en el polideportivo':'🏟️','estoy cansado':'😴','quiero repetir':'🔄',
+};
+
 let currentCategories = [];
 let manualTab = null; // si el usuario cambia de pestaña manualmente, no sobreescribir
 
@@ -1074,7 +1147,12 @@ function renderChips(cat) {
 function addChip(word, container) {
   const chip = document.createElement('button');
   chip.className = 'chip';
-  chip.textContent = word;
+  const emoji = EMOJI_MAP[word];
+  if (emoji) {
+    chip.innerHTML = `<span class="chip-emoji">${emoji}</span><span>${word}</span>`;
+  } else {
+    chip.textContent = word;
+  }
   chip.onclick = () => insertWord(word);
   container.appendChild(chip);
 }
@@ -1362,6 +1440,23 @@ function isValidPhrase(text) {
   return hasVerb(text);
 }
 
+function launchConfetti() {
+  const colors = ['#7c3aed','#ec4899','#10b981','#f59e0b','#2563eb','#ef4444','#06b6d4'];
+  const sb = document.querySelector('.sentence-builder');
+  const rect = sb.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top;
+  for (let i = 0; i < 22; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 60 + Math.random() * 130;
+    el.style.cssText = `left:${cx}px;top:${cy}px;background:${colors[i%colors.length]};width:${6+Math.random()*7}px;height:${6+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'3px'};--tx:${Math.cos(angle)*distance}px;--ty:${Math.sin(angle)*distance-90}px;--rot:${Math.random()*720-360}deg;--dur:${0.55+Math.random()*0.6}s;animation-delay:${Math.random()*0.12}s;`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+
 function showGrammarHint() {
   const sb = document.querySelector('.sentence-builder');
   sb.classList.add('invalid');
@@ -1393,6 +1488,7 @@ function sendMessage() {
   checkMilestones(words);
 
   addMessage(text, 'user');
+  launchConfetti();
   trackRecentWords(text);
   sessionResponses++;
   if (words > sessionBestWords) sessionBestWords = words;
