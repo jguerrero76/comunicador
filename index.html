@@ -1442,7 +1442,7 @@ function speakText() {
   utter.onend = utter.onerror = () => { speaking = false; btn.querySelector('.btn-icon').textContent = '🔊'; btn.classList.remove('speaking'); };
 
   synth.cancel();
-  synth.speak(utter);
+  setTimeout(() => synth.speak(utter), 80);
 }
 
 function stopSpeaking() {
@@ -1960,7 +1960,7 @@ function addMessage(text, type) {
       const v = getBestSpanishVoice(); if (v) utter.voice = v;
       speakMsgBtn.textContent = '⏹';
       utter.onend = utter.onerror = () => { speakMsgBtn.textContent = '🔊'; };
-      synth.cancel(); synth.speak(utter);
+      synth.cancel(); setTimeout(() => synth.speak(utter), 80);
     };
     div.style.display = 'flex';
     div.style.alignItems = 'flex-start';
