@@ -42,9 +42,11 @@
     }
 
     /* ── Selector de temas ── */
-    #topic-screen { max-width: 600px; margin: 0 auto; }
+    #topic-screen { max-width: 900px; margin: 0 auto; }
     #topic-screen h2 { text-align: center; margin-bottom: 20px; font-size: 1.25rem; font-weight: 800; color: var(--text); }
     .topics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (min-width: 540px) { .topics-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 720px) { .topics-grid { grid-template-columns: repeat(5, 1fr); } }
 
     .topic-btn {
       background: var(--card); border: 2px solid #E7E5E4; border-radius: 20px;
@@ -58,7 +60,7 @@
     .topic-btn .label { font-size: 0.82rem; font-weight: 800; color: var(--text); }
 
     /* ── Chat ── */
-    #chat-screen { max-width: 600px; margin: 0 auto; display: none; }
+    #chat-screen { max-width: 900px; margin: 0 auto; display: none; }
 
     .chat-header { background:var(--card); border-radius:16px; padding:12px 16px; margin-bottom:10px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #E7E5E4; }
     .chat-header .topic-icon { font-size: 2rem; }
@@ -97,9 +99,10 @@
     .word-panel-tabs { display: flex; gap: 6px; margin-bottom: 9px; overflow-x: auto; scrollbar-width: none; }
     .word-panel-tabs::-webkit-scrollbar { display: none; }
     .tab-btn { border: 2px solid transparent; border-radius: 20px; padding: 5px 13px; font-size: 0.77rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.18s; flex-shrink: 0; background: #F5F3EF; color: #78716C; }
-    .tab-btn.active { background: #F97316; color: #fff; border-color: #F97316; box-shadow: 0 3px 10px rgba(249,115,22,0.3); }
-    .tab-btn:hover:not(.active) { background: #FFF7ED; color: #EA580C; border-color: #FDBA74; transform: scale(1.05); }
+    .tab-btn.active { color: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.18); }
+    .tab-btn:hover:not(.active) { filter: brightness(0.95); transform: scale(1.05); }
     .word-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    @media (min-width: 600px) { .word-chips { gap: 10px; } }
     .chip { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; background: #FFFFFF; border: 1.5px solid #E7E5E4; border-radius: 16px; padding: 10px 8px 8px; font-size: 0.78rem; cursor: pointer; transition: all 0.15s ease; font-weight: 700; user-select: none; min-height: 78px; min-width: 74px; max-width: 100px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); color: #1C1917; }
     .chip-picto { width: 44px; height: 44px; object-fit: contain; flex-shrink: 0; border-radius: 6px; }
     .chip-picto.loading { opacity: 0.3; }
@@ -482,7 +485,7 @@ const WORD_BANK = {
 const TOPICS = {
   dia: {
     name: 'Mi día', emoji: '🌞',
-    starter: '¡Hola! Cuéntame, ¿cómo ha sido tu día hoy?',
+    starter: '¡Hola Gonzalo! Cuéntame, ¿cómo ha sido tu día hoy?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'dia', 'terapias'],
     responses: [
       { praise: '¡Qué bien que me lo cuentas!',       q: '¿Qué es lo que más te ha gustado de hoy?' },
@@ -509,7 +512,7 @@ const TOPICS = {
   },
   juegos: {
     name: 'Juegos', emoji: '🎮',
-    starter: '¡Hola! ¿A qué juego te gusta jugar más?',
+    starter: '¡Hola Gonzalo! ¿A qué juego te gusta jugar más?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'juegos'],
     responses: [
       { praise: '¡Ese juego mola muchísimo!',         q: '¿Qué es lo que más te gusta de ese juego?' },
@@ -536,7 +539,7 @@ const TOPICS = {
   },
   series: {
     name: 'Series y Pelis', emoji: '🎬',
-    starter: '¡Hola! ¿Tienes alguna serie o película favorita?',
+    starter: '¡Hola Gonzalo! ¿Tienes alguna serie o película favorita?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'series'],
     responses: [
       { praise: '¡Uy, eso me suena muy bien!',        q: '¿De qué trata esa serie o película?' },
@@ -563,7 +566,7 @@ const TOPICS = {
   },
   animales: {
     name: 'Animales', emoji: '🐾',
-    starter: '¡Hola! ¿Tienes algún animal favorito?',
+    starter: '¡Hola Gonzalo! ¿Tienes algún animal favorito?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'animales'],
     responses: [
       { praise: '¡Qué animal tan chulo has elegido!', q: '¿Por qué te gusta tanto ese animal?' },
@@ -590,7 +593,7 @@ const TOPICS = {
   },
   comida: {
     name: 'Comida', emoji: '🍕',
-    starter: '¡Hola! ¿Cuál es tu comida favorita?',
+    starter: '¡Hola Gonzalo! ¿Cuál es tu comida favorita?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'comida'],
     responses: [
       { praise: '¡Mmm, qué rico!',                    q: '¿Por qué te gusta tanto esa comida?' },
@@ -617,7 +620,7 @@ const TOPICS = {
   },
   lugares: {
     name: 'Lugares', emoji: '🗺️',
-    starter: '¡Hola! ¿Cuál es tu lugar favorito para ir?',
+    starter: '¡Hola Gonzalo! ¿Cuál es tu lugar favorito para ir?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'lugares'],
     responses: [
       { praise: '¡Ese sitio suena genial!',           q: '¿Qué es lo que más te gusta de ese lugar?' },
@@ -644,7 +647,7 @@ const TOPICS = {
   },
   musica: {
     name: 'Música', emoji: '🎵',
-    starter: '¡Hola! ¿Tienes alguna canción o grupo favorito?',
+    starter: '¡Hola Gonzalo! ¿Tienes alguna canción o grupo favorito?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'musica'],
     responses: [
       { praise: '¡Qué buena música tienes!',          q: '¿Qué es lo que más te gusta de esa canción?' },
@@ -666,7 +669,7 @@ const TOPICS = {
   },
   cole: {
     name: 'El cole', emoji: '🏫',
-    starter: '¡Hola! Cuéntame, ¿cómo ha ido hoy en el cole?',
+    starter: '¡Hola Gonzalo! Cuéntame, ¿cómo ha ido hoy en el cole?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'cole'],
     responses: [
       { praise: '¡Gracias por contármelo!',           q: '¿Qué es lo que más te ha gustado hoy en el cole?' },
@@ -688,7 +691,7 @@ const TOPICS = {
   },
   deporte: {
     name: 'Deportes', emoji: '⚽',
-    starter: '¡Hola! ¿Te gusta algún deporte?',
+    starter: '¡Hola Gonzalo! ¿Te gusta algún deporte?',
     wordCategories: ['comunes', 'sujetos', 'sentimientos', 'deporte'],
     responses: [
       { praise: '¡Qué deportista!',                   q: '¿Qué es lo que más te gusta de ese deporte?' },
@@ -1082,6 +1085,22 @@ const EMOJI_MAP = {
 let currentCategories = [];
 let manualTab = null; // si el usuario cambia de pestaña manualmente, no sobreescribir
 
+const CAT_COLORS = {
+  comunes:      '#F59E0B',
+  sujetos:      '#3B82F6',
+  sentimientos: '#EC4899',
+  terapias:     '#8B5CF6',
+  dia:          '#F97316',
+  juegos:       '#22C55E',
+  series:       '#EF4444',
+  animales:     '#14B8A6',
+  comida:       '#EA580C',
+  lugares:      '#0EA5E9',
+  musica:       '#A855F7',
+  cole:         '#10B981',
+  deporte:      '#3B82F6',
+};
+
 // ── Pictogramas ARASAAC ───────────────────────────────────────────────────────
 const _pictoCache = JSON.parse(localStorage.getItem('arasaac_v1') || '{}');
 const customPictos = JSON.parse(localStorage.getItem('custom_pictos') || '{}');
@@ -1181,7 +1200,13 @@ function buildWordPanel(categories) {
     const btn = document.createElement('button');
     btn.className = 'tab-btn';
     btn.textContent = WORD_BANK[cat].label;
-    btn.onclick = () => { manualTab = cat; renderChips(cat); setActiveTab(btn); };
+    const col = CAT_COLORS[cat] || '#F97316';
+    btn.style.cssText = `border-color:${col}22;color:${col};background:${col}14;`;
+    btn.onclick = () => {
+      manualTab = cat;
+      renderChips(cat, col);
+      setActiveTab(btn);
+    };
     tabsEl.appendChild(btn);
   });
 
@@ -1193,26 +1218,24 @@ function setActiveTab(activeBtn) {
   activeBtn.classList.add('active');
 }
 
-function renderChips(cat) {
+function renderChips(cat, color) {
   const chipsEl = document.getElementById('word-chips');
   chipsEl.innerHTML = '';
-  WORD_BANK[cat].words.forEach(word => addChip(word, chipsEl));
+  const col = color || CAT_COLORS[cat] || '#F97316';
+  WORD_BANK[cat].words.forEach(word => addChip(word, chipsEl, col));
 }
 
-function addChip(word, container) {
+function addChip(word, container, color) {
   const chip = document.createElement('button');
   chip.className = 'chip';
-  const emoji = EMOJI_MAP[word];
-  // Placeholder: emoji o icono genérico mientras carga pictograma
-  const placeholder = emoji || '🖼️';
-  chip.innerHTML = `<img class="chip-picto loading" src="" alt="${word}" aria-hidden="true"><span>${word}</span>`;
+  const col = color || '#F97316';
+  chip.style.cssText = `border-color:${col}44;border-top:3px solid ${col};`;
+  chip.innerHTML = `<img class="chip-picto loading" src="" alt="${word}" aria-hidden="true"><span style="color:${col}cc;">${word}</span>`;
   chip.onclick = () => insertWord(word);
   container.appendChild(chip);
-  // Carga asíncrona del pictograma ARASAAC
   loadPictoInChip(chip, word).catch(() => {
-    // Si falla, mostrar emoji de fallback
     const img = chip.querySelector('.chip-picto');
-    if (img) { img.outerHTML = `<span class="chip-emoji">${placeholder}</span>`; }
+    if (img) { img.outerHTML = `<span class="chip-emoji">${EMOJI_MAP[word]||'💬'}</span>`; }
   });
 }
 
@@ -1225,7 +1248,7 @@ function updateSuggestions() {
 
   const chipsEl = document.getElementById('word-chips');
   chipsEl.innerHTML = '';
-  suggestions.forEach(w => addChip(w, chipsEl));
+  suggestions.forEach(w => addChip(w, chipsEl, '#F97316'));
 }
 
 function getSuggestions(text) {
@@ -1921,7 +1944,33 @@ function showGrammarHint() {
 function addMessage(text, type) {
   const div = document.createElement('div');
   div.className = 'msg ' + type;
-  div.textContent = text;
+
+  if (type === 'ai') {
+    // Texto + botón de escuchar
+    const span = document.createElement('span');
+    span.textContent = text;
+    const speakMsgBtn = document.createElement('button');
+    speakMsgBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:1.1rem;margin-left:8px;opacity:0.6;vertical-align:middle;padding:0;line-height:1;flex-shrink:0;';
+    speakMsgBtn.title = 'Escuchar';
+    speakMsgBtn.textContent = '🔊';
+    speakMsgBtn.onclick = (e) => {
+      e.stopPropagation();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'es-ES'; utter.rate = 0.92;
+      const v = getBestSpanishVoice(); if (v) utter.voice = v;
+      speakMsgBtn.textContent = '⏹';
+      utter.onend = utter.onerror = () => { speakMsgBtn.textContent = '🔊'; };
+      synth.cancel(); synth.speak(utter);
+    };
+    div.style.display = 'flex';
+    div.style.alignItems = 'flex-start';
+    div.style.gap = '4px';
+    div.appendChild(span);
+    div.appendChild(speakMsgBtn);
+  } else {
+    div.textContent = text;
+  }
+
   const msgs = document.getElementById('messages');
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
