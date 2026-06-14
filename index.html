@@ -130,17 +130,13 @@
     .tab-btn.active:nth-child(5) { background: #f59e0b; color: #fff; box-shadow: 0 3px 10px rgba(245,158,11,0.4); }
     .tab-btn:hover:not(.active) { transform: scale(1.05); }
     .word-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; border: 2px solid transparent; border-radius: 16px; padding: 8px 10px 7px; font-size: 0.82rem; cursor: pointer; transition: all 0.15s cubic-bezier(0.34,1.4,0.64,1); font-weight: 700; user-select: none; min-height: 72px; min-width: 72px; max-width: 100px; text-align: center; }
+    .chip { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; border: 1.5px solid #e5e7eb; border-radius: 16px; padding: 9px 8px 8px; font-size: 0.82rem; cursor: pointer; transition: all 0.15s cubic-bezier(0.34,1.4,0.64,1); font-weight: 700; user-select: none; min-height: 72px; min-width: 72px; max-width: 100px; text-align: center; }
     .chip-picto { width: 44px; height: 44px; object-fit: contain; flex-shrink: 0; border-radius: 6px; }
     .chip-picto.loading { opacity: 0.3; }
     .chip-emoji { font-size: 1.6em; line-height: 1; flex-shrink: 0; }
-    .chip:nth-child(5n+1) { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
-    .chip:nth-child(5n+2) { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-    .chip:nth-child(5n+3) { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
-    .chip:nth-child(5n+4) { background: #dcfce7; color: #065f46; border-color: #6ee7b7; }
-    .chip:nth-child(5n+5) { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
-    .chip:hover { transform: scale(1.08) translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .chip:active { transform: scale(0.95); }
+    .chip { background: #ffffff; color: #1e1b4b; border-color: #e5e7eb; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .chip:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(124,58,237,0.15); border-color: #a78bfa; }
+    .chip:active { transform: scale(0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
 
     /* ── Sentence Builder (área de entrada) ── */
     .sentence-builder {
@@ -287,6 +283,11 @@
       animation: shake 0.45s cubic-bezier(0.36,0.07,0.19,0.97);
     }
 
+    /* ── Admin ── */
+    .admin-btn { position:absolute; top:18px; right:16px; background:#f3f0ff; border:2px solid #c4b5fd; border-radius:10px; padding:7px 12px; font-size:0.82rem; font-weight:800; color:#7c3aed; cursor:pointer; transition:all 0.15s; z-index:10; }
+    .admin-btn:hover { background:#ede9fe; transform:scale(1.05); }
+    header { position:relative; }
+
     @media (max-width: 480px) {
       body { padding: 8px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
 
@@ -340,6 +341,7 @@
 <body>
 
 <header>
+  <button class="admin-btn" onclick="openAdmin()">⚙️ Admin</button>
   <h1>💬 Comunicador</h1>
   <p>Hablemos juntos</p>
   <div class="stars-bar">⭐ <span id="total-stars">0</span> estrellas totales</div>
@@ -1135,6 +1137,8 @@ let manualTab = null; // si el usuario cambia de pestaña manualmente, no sobree
 
 // ── Pictogramas ARASAAC ───────────────────────────────────────────────────────
 const _pictoCache = JSON.parse(localStorage.getItem('arasaac_v1') || '{}');
+const customPictos = JSON.parse(localStorage.getItem('custom_pictos') || '{}');
+function saveCustomPictos() { try { localStorage.setItem('custom_pictos', JSON.stringify(customPictos)); } catch(e) {} }
 
 function _savePictoCache() {
   try { localStorage.setItem('arasaac_v1', JSON.stringify(_pictoCache)); } catch(e) {}
@@ -1165,11 +1169,22 @@ async function _fetchPictoId(phrase) {
 }
 
 async function loadPictoInChip(chip, phrase) {
-  const id = await _fetchPictoId(phrase);
   const img = chip.querySelector('.chip-picto');
   if (!img) return;
+
+  // Imagen personalizada tiene prioridad
+  const custom = customPictos[phrase];
+  if (custom) {
+    const src = custom.type === 'url' ? custom.data : `https://static.arasaac.org/pictograms/${custom.id}/${custom.id}_300.png`;
+    img.onerror = () => { const e = EMOJI_MAP[phrase]||'💬'; img.outerHTML=`<span class="chip-emoji">${e}</span>`; };
+    img.src = src;
+    img.classList.remove('loading');
+    return;
+  }
+
+  // ARASAAC automático
+  const id = await _fetchPictoId(phrase);
   if (!id) {
-    // Sin pictograma: usar emoji de fallback
     const emoji = EMOJI_MAP[phrase] || '💬';
     img.outerHTML = `<span class="chip-emoji">${emoji}</span>`;
     return;
@@ -1416,6 +1431,7 @@ function speakText() {
   utter.onstart = () => { speaking = true; btn.querySelector('.btn-icon').textContent = '⏹'; btn.classList.add('speaking'); };
   utter.onend = utter.onerror = () => { speaking = false; btn.querySelector('.btn-icon').textContent = '🔊'; btn.classList.remove('speaking'); };
 
+  synth.cancel();
   synth.speak(utter);
 }
 
@@ -1424,13 +1440,6 @@ function stopSpeaking() {
   speaking = false;
   const btn = document.getElementById('speak-btn');
   if (btn) { const icon = btn.querySelector('.btn-icon'); if (icon) icon.textContent = '🔊'; btn.classList.remove('speaking'); }
-}
-
-function stopSpeaking() {
-  synth.cancel();
-  speaking = false;
-  const btn = document.getElementById('speak-btn');
-  if (btn) { btn.textContent = '🔊'; btn.classList.remove('speaking'); }
 }
 
 function countWords(text) {
@@ -1544,6 +1553,263 @@ function launchConfetti() {
     document.body.appendChild(el);
     el.addEventListener('animationend', () => el.remove());
   }
+}
+
+// ── Panel de administración de pictogramas ────────────────────────────────────
+let _adminEditWord = null;
+
+function openAdmin() {
+  const old = document.getElementById('admin-modal');
+  if (old) old.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'admin-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:#0f0a28;z-index:800;overflow-y:auto;-webkit-overflow-scrolling:touch;';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'max-width:600px;margin:0 auto;padding:16px 14px 40px;';
+
+  // Header del admin
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;';
+  hdr.innerHTML = `
+    <div>
+      <h2 style="color:#fff;font-size:1.2rem;font-weight:900;margin-bottom:2px;">⚙️ Personalizar Pictogramas</h2>
+      <p style="color:#a78bfa;font-size:0.78rem;">Toca cualquier palabra para añadir una foto real o cambiar el pictograma</p>
+    </div>
+    <button onclick="closeAdmin()" style="background:#ffffff18;color:#fff;border:none;border-radius:12px;padding:10px 14px;font-size:0.9rem;font-weight:800;cursor:pointer;flex-shrink:0;">✕</button>
+  `;
+  wrap.appendChild(hdr);
+
+  // Lista de palabras por categoría
+  Object.entries(WORD_BANK).forEach(([catKey, cat]) => {
+    const sec = document.createElement('div');
+    sec.style.cssText = 'margin-bottom:22px;';
+
+    const catTitle = document.createElement('p');
+    catTitle.style.cssText = 'color:#c4b5fd;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;';
+    catTitle.textContent = cat.label;
+    sec.appendChild(catTitle);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;';
+
+    cat.words.forEach(word => {
+      const card = document.createElement('button');
+      const hasCustom = !!customPictos[word];
+      card.style.cssText = `background:${hasCustom?'#1e3a2f':'#ffffff12'};border:1.5px solid ${hasCustom?'#10b981':'#ffffff22'};border-radius:12px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:68px;max-width:82px;transition:all 0.15s;`;
+      card.onclick = () => openEditPicto(word);
+
+      const custom = customPictos[word];
+      const img = document.createElement('img');
+      img.style.cssText = 'width:42px;height:42px;object-fit:contain;border-radius:6px;background:#fff1;';
+      img.alt = word;
+
+      const fallback = document.createElement('span');
+      fallback.style.cssText = 'font-size:1.5em;display:none;';
+      fallback.textContent = EMOJI_MAP[word] || '🖼️';
+
+      img.onerror = () => { img.style.display='none'; fallback.style.display='block'; };
+
+      if (custom) {
+        img.src = custom.type === 'url' ? custom.data : `https://static.arasaac.org/pictograms/${custom.id}/${custom.id}_300.png`;
+      } else {
+        _fetchPictoId(word).then(id => {
+          if (id) img.src = `https://static.arasaac.org/pictograms/${id}/${id}_300.png`;
+          else { img.style.display='none'; fallback.style.display='block'; }
+        });
+      }
+
+      const label = document.createElement('span');
+      label.style.cssText = 'color:#fff;font-size:0.68rem;font-weight:700;text-align:center;line-height:1.2;word-break:break-word;';
+      label.textContent = word;
+
+      card.appendChild(img);
+      card.appendChild(fallback);
+      card.appendChild(label);
+      if (hasCustom) {
+        const badge = document.createElement('span');
+        badge.style.cssText = 'background:#10b981;color:#fff;font-size:0.58rem;padding:1px 5px;border-radius:99px;font-weight:800;';
+        badge.textContent = '✓ Custom';
+        card.appendChild(badge);
+      }
+      grid.appendChild(card);
+    });
+
+    sec.appendChild(grid);
+    wrap.appendChild(sec);
+  });
+
+  modal.appendChild(wrap);
+  document.body.appendChild(modal);
+}
+
+function closeAdmin() {
+  document.getElementById('admin-modal')?.remove();
+}
+
+function openEditPicto(word) {
+  _adminEditWord = word;
+  document.getElementById('edit-picto-overlay')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'edit-picto-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:900;display:flex;align-items:center;justify-content:center;padding:16px;';
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#1e1b4b;border-radius:20px;padding:22px 20px;width:100%;max-width:340px;border:2px solid #7c3aed;';
+
+  // Título
+  const title = document.createElement('div');
+  title.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;';
+  title.innerHTML = `<h3 style="color:#fff;font-weight:900;font-size:1.05rem;">${word}</h3>`;
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'background:#ffffff18;color:#fff;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-weight:700;';
+  closeBtn.onclick = () => overlay.remove();
+  title.appendChild(closeBtn);
+  box.appendChild(title);
+
+  // Preview
+  const previewWrap = document.createElement('div');
+  previewWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:18px;';
+  const previewBox = document.createElement('div');
+  previewBox.style.cssText = 'background:#fff;border-radius:14px;padding:10px;width:88px;height:88px;display:flex;align-items:center;justify-content:center;';
+  const previewImg = document.createElement('img');
+  previewImg.id = 'admin-preview-img';
+  previewImg.style.cssText = 'width:68px;height:68px;object-fit:contain;';
+  const previewEmoji = document.createElement('span');
+  previewEmoji.id = 'admin-preview-emoji';
+  previewEmoji.style.cssText = 'font-size:2.8em;';
+  previewEmoji.textContent = EMOJI_MAP[word] || '🖼️';
+
+  const custom = customPictos[word];
+  if (custom) {
+    const src = custom.type==='url' ? custom.data : `https://static.arasaac.org/pictograms/${custom.id}/${custom.id}_300.png`;
+    previewImg.src = src;
+    previewEmoji.style.display = 'none';
+  } else {
+    previewImg.style.display = 'none';
+    _fetchPictoId(word).then(id => {
+      if (id) {
+        previewImg.src = `https://static.arasaac.org/pictograms/${id}/${id}_300.png`;
+        previewImg.style.display = 'block';
+        previewEmoji.style.display = 'none';
+      }
+    });
+  }
+  previewImg.onerror = () => { previewImg.style.display='none'; previewEmoji.style.display='block'; };
+  previewBox.appendChild(previewImg);
+  previewBox.appendChild(previewEmoji);
+  previewWrap.appendChild(previewBox);
+  box.appendChild(previewWrap);
+
+  // Opción 1: subir foto
+  const sec1 = document.createElement('div');
+  sec1.style.cssText = 'margin-bottom:14px;';
+  sec1.innerHTML = `<p style="color:#c4b5fd;font-size:0.75rem;font-weight:800;margin-bottom:7px;text-transform:uppercase;">📷 Subir foto real</p>`;
+  const fileLabel = document.createElement('label');
+  fileLabel.style.cssText = 'display:block;background:#7c3aed;color:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;font-weight:700;font-size:0.88rem;';
+  fileLabel.textContent = 'Elegir imagen de la galería';
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.style.display = 'none';
+  fileInput.onchange = () => { if (fileInput.files[0]) handleAdminImage(fileInput.files[0]); };
+  fileLabel.appendChild(fileInput);
+  sec1.appendChild(fileLabel);
+  box.appendChild(sec1);
+
+  // Opción 2: ID ARASAAC
+  const sec2 = document.createElement('div');
+  sec2.style.cssText = 'margin-bottom:18px;';
+  sec2.innerHTML = `<p style="color:#c4b5fd;font-size:0.75rem;font-weight:800;margin-bottom:7px;text-transform:uppercase;">🔢 ID de ARASAAC (número)</p>`;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+  const idInput = document.createElement('input');
+  idInput.id = 'admin-arasaac-id';
+  idInput.type = 'number';
+  idInput.placeholder = 'ej: 2732';
+  if (custom && custom.type==='arasaac') idInput.value = custom.id;
+  idInput.style.cssText = 'flex:1;background:#ffffff11;color:#fff;border:2px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:0.95rem;font-weight:700;';
+  const previewIdBtn = document.createElement('button');
+  previewIdBtn.textContent = 'Ver';
+  previewIdBtn.style.cssText = 'background:#4f46e5;color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700;';
+  previewIdBtn.onclick = () => {
+    const id = parseInt(idInput.value);
+    if (!id) return;
+    const pImg = document.getElementById('admin-preview-img');
+    const pEmoji = document.getElementById('admin-preview-emoji');
+    if (pImg) { pImg.src = `https://static.arasaac.org/pictograms/${id}/${id}_300.png`; pImg.style.display='block'; }
+    if (pEmoji) pEmoji.style.display='none';
+  };
+  row.appendChild(idInput);
+  row.appendChild(previewIdBtn);
+  const saveIdBtn = document.createElement('button');
+  saveIdBtn.textContent = '✓ Guardar ID ARASAAC';
+  saveIdBtn.style.cssText = 'width:100%;background:#10b981;color:#fff;border:none;border-radius:12px;padding:11px;font-size:0.88rem;font-weight:700;cursor:pointer;';
+  saveIdBtn.onclick = () => {
+    const id = parseInt(idInput.value);
+    if (!id) return;
+    customPictos[_adminEditWord] = { type:'arasaac', id };
+    saveCustomPictos();
+    overlay.remove();
+    reloadAdminCards();
+  };
+  sec2.appendChild(row);
+  sec2.appendChild(saveIdBtn);
+  box.appendChild(sec2);
+
+  // Botón restaurar (solo si hay custom)
+  if (custom) {
+    const restoreBtn = document.createElement('button');
+    restoreBtn.textContent = '🗑️ Restaurar pictograma automático';
+    restoreBtn.style.cssText = 'width:100%;background:#ef4444;color:#fff;border:none;border-radius:12px;padding:11px;font-size:0.85rem;font-weight:700;cursor:pointer;';
+    restoreBtn.onclick = () => {
+      delete customPictos[_adminEditWord];
+      saveCustomPictos();
+      const kw = _pictoKeyword(_adminEditWord);
+      delete _pictoCache[kw];
+      _savePictoCache();
+      overlay.remove();
+      reloadAdminCards();
+    };
+    box.appendChild(restoreBtn);
+  }
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function handleAdminImage(file) {
+  const maxSize = 200;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const ratio = Math.min(maxSize/img.width, maxSize/img.height, 1);
+    canvas.width = Math.round(img.width*ratio);
+    canvas.height = Math.round(img.height*ratio);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    URL.revokeObjectURL(url);
+    customPictos[_adminEditWord] = { type:'url', data:dataUrl };
+    saveCustomPictos();
+    // Actualizar preview
+    const pImg = document.getElementById('admin-preview-img');
+    const pEmoji = document.getElementById('admin-preview-emoji');
+    if (pImg) { pImg.src = dataUrl; pImg.style.display='block'; }
+    if (pEmoji) pEmoji.style.display='none';
+    reloadAdminCards();
+  };
+  img.src = url;
+}
+
+function reloadAdminCards() {
+  // Reconstruir el admin si está abierto
+  const modal = document.getElementById('admin-modal');
+  if (modal) { closeAdmin(); openAdmin(); }
 }
 
 function showGrammarHint() {
