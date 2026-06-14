@@ -263,10 +263,51 @@
     .messages::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 4px; }
 
     @media (max-width: 480px) {
+      body { padding: 8px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+
+      header { padding: 10px 0 8px; }
+      header h1 { font-size: 1.65rem; }
+      header p { font-size: 0.85rem; }
+      .stars-bar { font-size: 0.88rem; padding: 5px 14px; }
+
       .topics-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .topic-btn { padding: 14px 6px; }
       .topic-btn .emoji { font-size: 1.8rem; }
       .topic-btn .label { font-size: 0.78rem; }
+
+      .messages { min-height: 130px; max-height: 190px; padding: 12px; font-size: 0.93rem; }
+
+      .word-meter { padding: 10px 12px; margin-bottom: 8px; }
+      .word-meter-label { font-size: 0.75rem; }
+      .milestone { font-size: 0.65rem; }
+
+      .sentence-builder { padding: 13px 11px 10px; margin-bottom: 8px; border-width: 2.5px; }
+      .sb-label { font-size: 0.75rem; }
+      .sb-counter { font-size: 0.72rem; padding: 2px 9px; }
+      .sentence-chips { min-height: 44px; padding: 7px 8px; }
+      .sentence-chip { font-size: 0.87rem; padding: 5px 11px; }
+
+      .sb-input-row textarea { font-size: 1.1rem; min-height: 50px; padding: 10px 12px; }
+      .mic-btn { width: 50px; height: 50px; font-size: 1.25rem; }
+
+      .sb-actions { gap: 5px; }
+      .sb-action-btn { padding: 11px 3px 9px; border-radius: 12px; }
+      .sb-action-btn .btn-icon { font-size: 1.35rem; }
+      .sb-action-btn .btn-lbl { font-size: 0.58rem; }
+
+      .word-panel { padding: 9px 10px; margin-bottom: 8px; }
+      .tab-btn { padding: 6px 12px; font-size: 0.75rem; min-height: 34px; }
+      .chip { padding: 8px 14px; font-size: 0.87rem; min-height: 38px; }
+
+      .stats-bar { padding: 9px 4px; margin-top: 8px; gap: 3px; }
+      .stat { padding: 7px 3px; }
+      .stat .val { font-size: 1.3rem; }
+      .stat .lbl { font-size: 0.62rem; }
+
+      .chat-header { padding: 10px 12px; margin-bottom: 10px; }
+      .chat-header .topic-icon { font-size: 1.7rem; }
+      .chat-header h2 { font-size: 0.95rem; }
+      .back-btn { padding: 6px 10px; font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -1158,6 +1199,25 @@ function undoWord() {
   if (!manualTab) updateSuggestions();
 }
 
+function getBestSpanishVoice() {
+  const voices = synth.getVoices();
+  const es = voices.filter(v => v.lang.startsWith('es'));
+  if (!es.length) return null;
+  // Orden de preferencia: neural/premium online > Google > local ES-ES > cualquier español
+  const checks = [
+    v => /neural|premium|enhanced|natural/i.test(v.name),
+    v => !v.localService && /google/i.test(v.name),
+    v => !v.localService,
+    v => v.lang === 'es-ES',
+    v => v.lang === 'es-MX',
+  ];
+  for (const fn of checks) {
+    const match = es.find(fn);
+    if (match) return match;
+  }
+  return es[0];
+}
+
 function speakText() {
   const text = document.getElementById('user-input').value.trim();
   if (!text) return;
@@ -1166,18 +1226,24 @@ function speakText() {
   const btn = document.getElementById('speak-btn');
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'es-ES';
-  utter.rate = 0.85;
-  utter.pitch = 1.1;
+  utter.rate = 0.92;
+  utter.pitch = 1.0;
+  utter.volume = 1.0;
 
-  // Prefer a Spanish voice if available
-  const voices = synth.getVoices();
-  const esVoice = voices.find(v => v.lang.startsWith('es'));
-  if (esVoice) utter.voice = esVoice;
+  const voice = getBestSpanishVoice();
+  if (voice) utter.voice = voice;
 
-  utter.onstart = () => { speaking = true; btn.textContent = '⏹'; btn.classList.add('speaking'); };
-  utter.onend = utter.onerror = () => { speaking = false; btn.textContent = '🔊'; btn.classList.remove('speaking'); };
+  utter.onstart = () => { speaking = true; btn.querySelector('.btn-icon').textContent = '⏹'; btn.classList.add('speaking'); };
+  utter.onend = utter.onerror = () => { speaking = false; btn.querySelector('.btn-icon').textContent = '🔊'; btn.classList.remove('speaking'); };
 
   synth.speak(utter);
+}
+
+function stopSpeaking() {
+  synth.cancel();
+  speaking = false;
+  const btn = document.getElementById('speak-btn');
+  if (btn) { const icon = btn.querySelector('.btn-icon'); if (icon) icon.textContent = '🔊'; btn.classList.remove('speaking'); }
 }
 
 function stopSpeaking() {
