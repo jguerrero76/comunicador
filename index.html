@@ -139,60 +139,101 @@
     .chip:hover { transform: scale(1.08) translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .chip:active { transform: scale(0.95); }
 
-    /* ── Área de entrada ── */
-    .input-area { display: flex; gap: 8px; align-items: flex-end; }
-    .input-wrap { flex: 1; }
-    textarea {
-      width: 100%; border: 2.5px solid #e0d9ff; border-radius: 16px;
-      padding: 12px 16px; font-size: 1rem; font-family: inherit;
+    /* ── Sentence Builder (área de entrada) ── */
+    .sentence-builder {
+      background: #ffffff;
+      border: 3px solid #7c3aed;
+      border-radius: 22px;
+      padding: 16px 14px 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 6px 28px rgba(124,58,237,0.18);
+      position: relative;
+    }
+    .sentence-builder:focus-within {
+      box-shadow: 0 6px 28px rgba(124,58,237,0.3), 0 0 0 4px rgba(124,58,237,0.12);
+    }
+    .sb-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+    }
+    .sb-label {
+      font-size: 0.82rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sb-counter {
+      font-size: 0.78rem; font-weight: 800; color: #6d28d9;
+      background: #ede9fe; padding: 3px 11px; border-radius: 99px;
+    }
+    .sentence-chips {
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      min-height: 50px; padding: 8px 10px;
+      background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+      border: 2px dashed #c4b5fd; border-radius: 14px; margin-bottom: 10px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .sentence-chips.filled { border: 2.5px solid #7c3aed; background: linear-gradient(135deg, #fdf8ff, #ede9fe); }
+    .sentence-chip {
+      display: inline-flex; align-items: center;
+      border-radius: 20px; padding: 5px 13px;
+      font-size: 0.93rem; font-weight: 700; color: #fff;
+      animation: chipIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    @keyframes chipIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .sentence-placeholder {
+      color: #c4b5fd; font-size: 0.88rem; font-style: italic; font-weight: 600;
+      align-self: center; padding: 4px 2px;
+    }
+    .sb-input-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
+    .sb-input-row textarea {
+      flex: 1; border: 2px solid #e0d9ff; border-radius: 14px;
+      padding: 10px 14px; font-size: 1.1rem; font-family: inherit;
       resize: none; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-      min-height: 52px; max-height: 120px; line-height: 1.4; background: #faf5ff;
+      min-height: 48px; max-height: 110px; line-height: 1.4; background: #faf5ff;
     }
-    textarea:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167,139,250,0.25); }
-
-    .send-btn {
-      background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none;
-      border-radius: 16px; width: 52px; height: 52px; font-size: 1.4rem; cursor: pointer;
-      transition: all 0.18s; flex-shrink: 0; box-shadow: 0 4px 14px rgba(124,58,237,0.4);
-    }
-    .send-btn:hover { transform: scale(1.05); }
-    .send-btn:active { transform: scale(0.95); }
-    .send-btn:disabled { background: linear-gradient(135deg, #d1d5db, #9ca3af); box-shadow: none; cursor: not-allowed; }
-
-    .speak-btn {
-      background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none;
-      border-radius: 16px; width: 52px; height: 52px; font-size: 1.4rem; cursor: pointer;
-      transition: all 0.18s; flex-shrink: 0; box-shadow: 0 4px 14px rgba(16,185,129,0.4);
-    }
-    .speak-btn:hover { transform: scale(1.05); }
-    .speak-btn:active { transform: scale(0.95); }
-    .speak-btn:disabled { background: linear-gradient(135deg, #d1d5db, #9ca3af); box-shadow: none; cursor: not-allowed; }
-    .speak-btn.speaking { animation: pulse 0.8s infinite; }
-    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-
+    .sb-input-row textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.18); }
     .mic-btn {
       background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #065f46;
-      border: 2px solid #6ee7b7; border-radius: 16px; width: 52px; height: 52px;
+      border: 2px solid #6ee7b7; border-radius: 14px; width: 48px; height: 48px;
       font-size: 1.3rem; cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
     }
     .mic-btn:hover { background: linear-gradient(135deg, #6ee7b7, #34d399); color: #fff; }
     .mic-btn.listening { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border-color: #ef4444; animation: pulse 0.7s infinite; }
     .mic-btn.no-support { opacity: 0.35; cursor: not-allowed; }
-
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+    .sb-actions { display: flex; gap: 6px; }
+    .sb-action-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; border: none; border-radius: 14px; padding: 10px 4px 8px;
+      cursor: pointer; transition: all 0.18s; font-weight: 800;
+    }
+    .sb-action-btn .btn-icon { font-size: 1.3rem; line-height: 1; }
+    .sb-action-btn .btn-lbl { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
+    .sb-action-btn:active { transform: scale(0.93); }
     .undo-btn {
       background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d;
-      border: 2px solid #f9a8d4; border-radius: 16px; width: 52px; height: 52px;
-      font-size: 1.1rem; cursor: pointer; transition: all 0.18s; flex-shrink: 0; font-weight: 800;
+      border: 1.5px solid #f9a8d4;
     }
-    .undo-btn:hover { background: linear-gradient(135deg, #fda4af, #fb7185); color: #fff; border-color: #fb7185; }
-
+    .undo-btn:hover { background: linear-gradient(135deg, #fb7185, #f43f5e); color: #fff; border-color: #fb7185; }
+    .speak-btn {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #065f46;
+      border: 1.5px solid #6ee7b7;
+    }
+    .speak-btn:hover { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border-color: #10b981; }
+    .speak-btn.speaking { animation: pulse 0.8s infinite; background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
     .save-btn {
       background: linear-gradient(135deg, #fef9c3, #fef08a); color: #854d0e;
-      border: 2px solid #fbbf24; border-radius: 16px; width: 52px; height: 52px;
-      font-size: 1.3rem; cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+      border: 1.5px solid #fbbf24;
     }
-    .save-btn:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+    .save-btn:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; border-color: #f59e0b; }
     .save-btn.saved { animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    .send-btn {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff;
+      border: none; box-shadow: 0 4px 14px rgba(124,58,237,0.4); flex: 1.5;
+    }
+    .send-btn:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(124,58,237,0.5); }
+    .send-btn:disabled { background: linear-gradient(135deg, #d1d5db, #9ca3af); box-shadow: none; cursor: not-allowed; }
 
     /* ── Stats ── */
     .stats-bar { display: flex; justify-content: space-around; background: var(--card); border-radius: var(--radius); padding: 12px 8px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); gap: 4px; }
@@ -278,21 +319,38 @@
     </div>
   </div>
 
+  <div class="sentence-builder">
+    <div class="sb-header">
+      <span class="sb-label">✍️ Tu frase</span>
+      <span class="sb-counter"><span id="sb-word-count">0</span> palabras</span>
+    </div>
+    <div class="sentence-chips" id="sentence-chips">
+      <span class="sentence-placeholder">Toca una palabra de abajo o escribe aquí...</span>
+    </div>
+    <div class="sb-input-row">
+      <textarea id="user-input" placeholder="Escribe aquí..." rows="1"
+        oninput="onInput()" onkeydown="onKey(event)"></textarea>
+      <button class="mic-btn" onclick="toggleVoice()" id="mic-btn" title="Hablar">🎤</button>
+    </div>
+    <div class="sb-actions">
+      <button class="undo-btn sb-action-btn" onclick="undoWord()">
+        <span class="btn-icon">⌫</span><span class="btn-lbl">Borrar</span>
+      </button>
+      <button class="speak-btn sb-action-btn" onclick="speakText()" id="speak-btn">
+        <span class="btn-icon">🔊</span><span class="btn-lbl">Escuchar</span>
+      </button>
+      <button class="save-btn sb-action-btn" onclick="savePhrase()" id="save-btn">
+        <span class="btn-icon">⭐</span><span class="btn-lbl">Guardar</span>
+      </button>
+      <button class="send-btn sb-action-btn" onclick="sendMessage()" id="send-btn" disabled>
+        <span class="btn-icon">➤</span><span class="btn-lbl">Enviar</span>
+      </button>
+    </div>
+  </div>
+
   <div class="word-panel">
     <div class="word-panel-tabs" id="word-tabs"></div>
     <div class="word-chips" id="word-chips"></div>
-  </div>
-
-  <div class="input-area">
-    <div class="input-wrap">
-      <textarea id="user-input" placeholder="Escribe aquí o toca las palabras de arriba..." rows="1"
-        oninput="onInput()" onkeydown="onKey(event)"></textarea>
-    </div>
-    <button class="mic-btn" onclick="toggleVoice()" id="mic-btn" title="Hablar">🎤</button>
-    <button class="undo-btn" onclick="undoWord()" title="Borrar última palabra">⌫</button>
-    <button class="speak-btn" onclick="speakText()" id="speak-btn" title="Escuchar frase">🔊</button>
-    <button class="save-btn" onclick="savePhrase()" id="save-btn" title="Guardar frase">⭐</button>
-    <button class="send-btn" onclick="sendMessage()" id="send-btn" disabled>➤</button>
   </div>
 
   <div class="stats-bar">
@@ -696,6 +754,7 @@ if (SpeechRecognition) {
     ta.style.height = 'auto';
     ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
     updateMeter(countWords(ta.value));
+    updateSentenceChips();
     document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
     if (!manualTab) updateSuggestions();
   };
@@ -800,6 +859,7 @@ function useSavedPhrase(phrase) {
   ta.style.height = 'auto';
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   updateMeter(countWords(ta.value));
+  updateSentenceChips();
   document.getElementById('send-btn').disabled = false;
   if (!manualTab) updateSuggestions();
 }
@@ -1057,6 +1117,7 @@ function insertWord(word) {
   ta.style.height = 'auto';
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   updateMeter(countWords(ta.value));
+  updateSentenceChips();
   document.getElementById('send-btn').disabled = false;
 
   // Actualizar sugerencias tras insertar
@@ -1068,6 +1129,7 @@ function onInput() {
   ta.style.height = 'auto';
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   updateMeter(countWords(ta.value));
+  updateSentenceChips();
   document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
 
   // Volver a sugerencias automáticas si no hay tab manual
@@ -1090,6 +1152,7 @@ function undoWord() {
   ta.style.height = 'auto';
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   updateMeter(countWords(ta.value));
+  updateSentenceChips();
   document.getElementById('send-btn').disabled = ta.value.trim().length === 0;
   ta.focus();
   if (!manualTab) updateSuggestions();
@@ -1141,7 +1204,42 @@ function resetMeter() {
   document.getElementById('user-input').value = '';
   document.getElementById('user-input').style.height = 'auto';
   updateMeter(0);
+  updateSentenceChips();
   document.getElementById('send-btn').disabled = true;
+}
+
+function updateSentenceChips() {
+  const ta = document.getElementById('user-input');
+  const chips = document.getElementById('sentence-chips');
+  const sbCount = document.getElementById('sb-word-count');
+  if (!chips) return;
+  const text = ta ? ta.value.trim() : '';
+  const words = text ? text.split(/\s+/) : [];
+  if (sbCount) sbCount.textContent = words.length;
+  chips.innerHTML = '';
+  if (words.length === 0) {
+    chips.classList.remove('filled');
+    const ph = document.createElement('span');
+    ph.className = 'sentence-placeholder';
+    ph.textContent = 'Toca una palabra de abajo o escribe aquí...';
+    chips.appendChild(ph);
+  } else {
+    chips.classList.add('filled');
+    const COLORS = [
+      'linear-gradient(135deg,#7c3aed,#6d28d9)',
+      'linear-gradient(135deg,#2563eb,#1d4ed8)',
+      'linear-gradient(135deg,#ec4899,#db2777)',
+      'linear-gradient(135deg,#10b981,#059669)',
+      'linear-gradient(135deg,#f59e0b,#d97706)',
+    ];
+    words.forEach((word, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'sentence-chip';
+      chip.style.background = COLORS[i % COLORS.length];
+      chip.textContent = word;
+      chips.appendChild(chip);
+    });
+  }
 }
 
 function addMessage(text, type) {
