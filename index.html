@@ -418,7 +418,15 @@ const WORD_BANK = {
     words: ['a', 'al', 'en', 'con', 'de', 'para', 'por',
             'primero', 'luego', 'después', 'porque', 'también', 'y', 'pero', 'cuando',
             'siempre', 'nunca', 'a veces', 'mucho', 'muy', 'bastante', 'un poco',
-            'hoy', 'ayer', 'mañana', 'me gusta', 'no me gusta', 'quiero', 'me encanta'],
+            'hoy', 'ayer', 'mañana', 'por favor', 'gracias'],
+  },
+  verbos: {
+    label: '⚡ Verbos',
+    words: ['quiero', 'tengo', 'fui', 'estoy', 'voy',
+            'he ido', 'he comido', 'he jugado', 'he visto', 'he hecho',
+            'me gusta', 'me encanta', 'me siento', 'me da', 'me ha gustado',
+            'puedo', 'ha sido', 'hay', 'sé', 'toca',
+            'no quiero', 'no puedo', 'no sé', 'no me gusta'],
   },
   sujetos: {
     label: '👤 Quién',
@@ -430,9 +438,10 @@ const WORD_BANK = {
   },
   sentimientos: {
     label: '😊 Cómo me siento',
-    words: ['contento', 'feliz', 'bien', 'mal', 'cansado', 'aburrido',
-            'emocionado', 'nervioso', 'tranquilo', 'enfadado', 'triste',
-            'divertido', 'genial', 'increíble', 'chulo', 'guay'],
+    words: ['contento', 'feliz', 'bien', 'mal', 'regular', 'cansado',
+            'aburrido', 'emocionado', 'nervioso', 'tranquilo', 'enfadado', 'triste',
+            'orgulloso', 'asustado', 'agobiado', 'ilusionado', 'raro',
+            'genial', 'increíble', 'guay'],
   },
   terapias: {
     label: '🧩 Terapias',
@@ -516,7 +525,7 @@ const TOPICS = {
   dia: {
     name: 'Mi día', emoji: '😎',
     starter: '¡Hola Gonzalo! Cuéntame, ¿cómo ha sido tu día hoy?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'dia', 'terapias'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'dia', 'terapias'],
     responses: [
       { praise: '¡Qué bien que me lo cuentas!',       q: '¿Qué es lo que más te ha gustado de hoy?' },
       { praise: '¡Genial, gracias por contármelo!',   q: '¿Has hecho algo divertido esta tarde?' },
@@ -543,7 +552,7 @@ const TOPICS = {
   juegos: {
     name: 'Juegos', emoji: '👾',
     starter: '¡Hola Gonzalo! ¿A qué juego te gusta jugar más?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'juegos'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'juegos'],
     responses: [
       { praise: '¡Ese juego mola muchísimo!',         q: '¿Qué es lo que más te gusta de ese juego?' },
       { praise: '¡Qué buena elección!',               q: '¿Juegas solo o con amigos?' },
@@ -570,7 +579,7 @@ const TOPICS = {
   series: {
     name: 'Series y Pelis', emoji: '🍿',
     starter: '¡Hola Gonzalo! ¿Tienes alguna serie o película favorita?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'series'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'series'],
     responses: [
       { praise: '¡Uy, eso me suena muy bien!',        q: '¿De qué trata esa serie o película?' },
       { praise: '¡Qué buena elección!',               q: '¿Cuál es tu personaje favorito y por qué?' },
@@ -597,7 +606,7 @@ const TOPICS = {
   animales: {
     name: 'Animales', emoji: '🦁',
     starter: '¡Hola Gonzalo! ¿Tienes algún animal favorito?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'animales'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'animales'],
     responses: [
       { praise: '¡Qué animal tan chulo has elegido!', q: '¿Por qué te gusta tanto ese animal?' },
       { praise: '¡Es un animal increíble!',           q: '¿Sabes algo curioso sobre ese animal?' },
@@ -624,7 +633,7 @@ const TOPICS = {
   comida: {
     name: 'Comida', emoji: '😋',
     starter: '¡Hola Gonzalo! ¿Cuál es tu comida favorita?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'comida'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'comida'],
     responses: [
       { praise: '¡Mmm, qué rico!',                    q: '¿Por qué te gusta tanto esa comida?' },
       { praise: '¡Qué buena elección!',               q: '¿Cuándo la comes normalmente, en casa o fuera?' },
@@ -651,7 +660,7 @@ const TOPICS = {
   lugares: {
     name: 'Lugares', emoji: '🚀',
     starter: '¡Hola Gonzalo! ¿Cuál es tu lugar favorito para ir?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'lugares'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'lugares'],
     responses: [
       { praise: '¡Ese sitio suena genial!',           q: '¿Qué es lo que más te gusta de ese lugar?' },
       { praise: '¡Qué buena elección!',               q: '¿Con quién vas normalmente a ese lugar?' },
@@ -678,7 +687,7 @@ const TOPICS = {
   musica: {
     name: 'Música', emoji: '🎸',
     starter: '¡Hola Gonzalo! ¿Tienes alguna canción o grupo favorito?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'musica'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'musica'],
     responses: [
       { praise: '¡Qué buena música tienes!',          q: '¿Qué es lo que más te gusta de esa canción?' },
       { praise: '¡Genial elección!',                  q: '¿Cuándo escuchas esa música, en casa, de camino...?' },
@@ -700,7 +709,7 @@ const TOPICS = {
   cole: {
     name: 'El cole', emoji: '📚',
     starter: '¡Hola Gonzalo! Cuéntame, ¿cómo ha ido hoy en el cole?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'cole'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'cole'],
     responses: [
       { praise: '¡Gracias por contármelo!',           q: '¿Qué es lo que más te ha gustado hoy en el cole?' },
       { praise: '¡Qué bien!',                         q: '¿Has hecho algo chulo en clase hoy?' },
@@ -722,7 +731,7 @@ const TOPICS = {
   deporte: {
     name: 'Deportes', emoji: '🏆',
     starter: '¡Hola Gonzalo! ¿Te gusta algún deporte?',
-    wordCategories: ['comunes', 'sujetos', 'sentimientos', 'deporte'],
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'deporte'],
     responses: [
       { praise: '¡Qué deportista!',                   q: '¿Qué es lo que más te gusta de ese deporte?' },
       { praise: '¡Genial elección!',                  q: '¿Lo practicas tú o solo lo ves?' },
@@ -1029,12 +1038,24 @@ const NEXT_PATTERNS = {
   'hoy':        ['he', 'fui', 'estoy', 'tengo', 'hay', 'toca', 'ha sido'],
   'ayer':       ['fui', 'estuve', 'comí', 'jugué', 'vi', 'fue'],
   'mañana':     ['voy', 'tengo', 'hay', 'toca', 'quiero'],
+  // Palabras sociales
+  'por favor':  ['quiero', 'ayuda', 'dame', 'puedo'],
+  'gracias':    ['por', 'mucho', 'de verdad'],
+  // Verbos negativos
+  'no quiero':  ['ir', 'comer', 'hacer', 'jugar', 'ver', 'más'],
+  'no puedo':   ['ir', 'hacer', 'comer', 'jugar', 'más'],
+  'no sé':      ['si', 'cómo', 'qué', 'por qué'],
+  // Emociones nuevas
+  'orgulloso':  ['porque', 'muy', 'de mí', 'con', 'cuando'],
+  'asustado':   ['porque', 'con', 'cuando', 'de'],
+  'agobiado':   ['porque', 'con', 'cuando', 'pero'],
+  'ilusionado': ['porque', 'muy', 'con', 'cuando', 'por'],
+  'regular':    ['porque', 'pero', 'un poco', 'cuando'],
   // Lugar / compañía
   'con':        ['mamá', 'papá', 'mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
   'en':         ['casa', 'el cole', 'el parque', 'el patio', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'el restaurante'],
   'a':          ['casa', 'el parque', 'el cole', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'veces'],
   'al':         ['parque', 'cole', 'restaurante', 'polideportivo', 'final'],
-  'con':        ['mamá', 'papá', 'mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
   'de':         ['lo que pasó', 'mis amigos', 'mis juegos', 'mis series', 'eso', 'todo'],
   'para':       ['mañana', 'el cole', 'descansar', 'jugar', 'comer', 'aprender'],
   'por':        ['eso', 'la mañana', 'la tarde', 'favor', 'aquí'],
@@ -1080,6 +1101,14 @@ const NEXT_PATTERNS = {
 };
 
 const EMOJI_MAP = {
+  // Verbos
+  'quiero':'🙏','tengo':'✋','fui':'🚶','estoy':'📍','voy':'➡️',
+  'he ido':'🚶','he comido':'🍽️','he jugado':'🎮','he visto':'👀','he hecho':'✅',
+  'me gusta':'❤️','me encanta':'😍','me siento':'💭','puedo':'💪',
+  'ha sido':'📅','no quiero':'🚫','no puedo':'❌','no sé':'🤷','no me gusta':'👎',
+  'por favor':'🙏','gracias':'🙌','toca':'📅',
+  // Emociones nuevas
+  'orgulloso':'🦁','asustado':'😱','agobiado':'😤','ilusionado':'✨','raro':'🤔','regular':'😐',
   // Quién
   'yo':'🙋','mamá':'👩','papá':'👨','mi familia':'👨‍👩‍👦','mis amigos':'👫',
   'el abuelo Pepillo':'👴','la abuela Juanita':'👵','la abuela Manoli':'👵',
@@ -1150,6 +1179,7 @@ let currentCategories = [];
 let manualTab = null; // si el usuario cambia de pestaña manualmente, no sobreescribir
 
 const CAT_COLORS = {
+  verbos:       '#EF4444',
   comunes:      '#F59E0B',
   sujetos:      '#3B82F6',
   sentimientos: '#EC4899',
@@ -1182,9 +1212,11 @@ function saveHelpConfig() { try { localStorage.setItem('help_config', JSON.strin
 
 const DEFAULT_STARTERS = [
   'Hoy he ido a', 'Hoy estoy', 'Hoy he comido', 'Hoy he jugado a',
-  'Ayer fui a', 'Ayer estuve en', 'Me siento', 'Me gusta mucho',
-  'Quiero', 'Ha sido', 'Esta mañana', 'Esta tarde',
-  'He estado en', 'He trabajado con', 'Mañana voy a',
+  'Me gusta mucho', 'No me gusta', 'Me siento', 'Me encanta',
+  'Quiero ir a', 'Tengo ganas de', 'Ha sido', 'Ha pasado',
+  'Ayer fui a', 'Esta mañana he', 'Esta tarde he',
+  'He estado en', 'He hablado con', 'Mañana voy a',
+  'Lo mejor ha sido', 'Estoy contento porque', 'No puedo',
 ];
 
 function _savePictoCache() {
