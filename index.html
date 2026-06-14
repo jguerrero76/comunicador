@@ -262,6 +262,19 @@
     .messages::-webkit-scrollbar { width: 4px; }
     .messages::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 4px; }
 
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      18% { transform: translateX(-9px); }
+      36% { transform: translateX(9px); }
+      54% { transform: translateX(-6px); }
+      72% { transform: translateX(6px); }
+    }
+    .sentence-builder.invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 6px 28px rgba(239,68,68,0.28) !important;
+      animation: shake 0.45s cubic-bezier(0.36,0.07,0.19,0.97);
+    }
+
     @media (max-width: 480px) {
       body { padding: 8px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
 
@@ -1308,6 +1321,56 @@ function updateSentenceChips() {
   }
 }
 
+// ── Validación gramatical ─────────────────────────────────────────────────────
+function hasVerb(text) {
+  const t = ' ' + text.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') + ' ';
+  return [
+    // auxiliares haber
+    / he /, / ha /, / hemos /, / han /,
+    // estar / ser
+    /estoy/, /estas?/, /estamos/, /estan/, /soy/, / es /, / eres /, /somos/, /son /,
+    // tener / ir / poder / querer
+    /tengo/, /tienes?/, /voy/, /va[s]? /, /vamos/, /fue/, /fui/, /fuimos/,
+    /quiero/, /quieres?/, /puedo/, /puedes?/,
+    // gustar / encantar
+    /me gusta/, /me encanta/, /me da /, /me pone/,
+    // comunes
+    /mola/, /suena/, / hay /, /toca[n]? /, /hace[n]? /,
+    // infinitivos como predicado
+    /jugar/, /comer/, /nadar/, /correr/, /bailar/, /cantar/, / ver /, / ir /,
+    /hablar/, /aprender/, /practicar/, /trabajar/,
+    // participios en frases verbales
+    /comido/, /jugado/, /visto/, /estado/, /hablado/, / ido /, /hecho/,
+    /aprendido/, /trabajado/, /practicado/, /terminado/, /pasado/, /gustado/,
+    // frases verbales compuestas
+    /lo he hecho/, /ha sido/, /me ha gustado/, /hemos (jugado|hecho|practicado|aprendido)/,
+    /me lo he pasado/,
+  ].some(p => p.test(t));
+}
+
+const VALID_SHORT = new Set([
+  'sí','si','no','bien','mal','genial','guay','claro','vale','ok',
+  'bueno','buena','perfecto','increíble','chulo','chula','mola',
+  'también','tampoco','nunca','siempre','gracias','hola','adiós',
+]);
+
+function isValidPhrase(text) {
+  const lower = text.trim().toLowerCase();
+  const words = lower.split(/\s+/);
+  if (words.length === 1) return VALID_SHORT.has(lower) || hasVerb(text);
+  return hasVerb(text);
+}
+
+function showGrammarHint() {
+  const sb = document.querySelector('.sentence-builder');
+  sb.classList.add('invalid');
+  setTimeout(() => sb.classList.remove('invalid'), 600);
+  addMessage('🤔 ¡Falta una acción! La frase necesita un verbo. Por ejemplo: "estoy", "quiero", "he ido", "me gusta"...', 'system');
+  const msgs = document.getElementById('messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
 function addMessage(text, type) {
   const div = document.createElement('div');
   div.className = 'msg ' + type;
@@ -1321,6 +1384,8 @@ function sendMessage() {
   const ta = document.getElementById('user-input');
   const text = ta.value.trim();
   if (!text) return;
+
+  if (!isValidPhrase(text)) { showGrammarHint(); return; }
 
   stopSpeaking();
   manualTab = null;
