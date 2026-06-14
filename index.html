@@ -155,37 +155,18 @@
     .mic-btn.no-support { opacity: 0.35; cursor: not-allowed; }
     @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
     .sb-actions { display: flex; gap: 6px; }
-    .sb-action-btn {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; border: none; border-radius: 14px; padding: 10px 4px 8px;
-      cursor: pointer; transition: all 0.18s; font-weight: 800;
-    }
+    .sb-action-btn { display:flex; flex-direction:column; align-items:center; gap:4px; border:none; border-radius:14px; padding:12px 6px 10px; font-size:0.65rem; font-weight:900; cursor:pointer; flex:1; transition:all 0.15s; text-transform:uppercase; letter-spacing:0.04em; }
     .sb-action-btn .btn-icon { font-size: 1.3rem; line-height: 1; }
     .sb-action-btn .btn-lbl { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
     .sb-action-btn:active { transform: scale(0.93); }
-    .undo-btn {
-      background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d;
-      border: 1.5px solid #f9a8d4;
-    }
-    .undo-btn:hover { background: linear-gradient(135deg, #fb7185, #f43f5e); color: #fff; border-color: #fb7185; }
-    .speak-btn {
-      background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #065f46;
-      border: 1.5px solid #6ee7b7;
-    }
-    .speak-btn:hover { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border-color: #10b981; }
-    .speak-btn.speaking { animation: pulse 0.8s infinite; background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
-    .save-btn {
-      background: linear-gradient(135deg, #fef9c3, #fef08a); color: #854d0e;
-      border: 1.5px solid #fbbf24;
-    }
-    .save-btn:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; border-color: #f59e0b; }
+    .undo-btn { background:#FEF2F2; color:#DC2626; }
+    .speak-btn { background:#F0FDF4; color:#16A34A; }
+    .speak-btn.speaking { background:#DCFCE7; animation: pulse 0.8s infinite; }
+    .save-btn { background:#FEFCE8; color:#CA8A04; }
     .save-btn.saved { animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-    .send-btn {
-      background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff;
-      border: none; box-shadow: 0 4px 14px rgba(124,58,237,0.4); flex: 1.5;
-    }
-    .send-btn:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(124,58,237,0.5); }
-    .send-btn:disabled { background: linear-gradient(135deg, #d1d5db, #9ca3af); box-shadow: none; cursor: not-allowed; }
+    .send-btn { background:#F97316; color:#fff; box-shadow:0 3px 12px rgba(249,115,22,0.35); flex: 1.5; }
+    .send-btn:not(:disabled):hover { background:#EA580C; transform:translateY(-2px); }
+    .send-btn:disabled { background:#E7E5E4; color:#A8A29E; box-shadow:none; cursor: not-allowed; }
 
     /* ── Stats ── */
     .stats-bar { display:flex; justify-content:space-around; gap:6px; margin-top:10px; }
@@ -194,19 +175,19 @@
     .stat .lbl { font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
 
     /* ── Popup ── */
-    #milestone-popup { display: none; position: fixed; inset: 0; background: rgba(30,27,75,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+    #milestone-popup { display: none; position: fixed; inset: 0; background: rgba(28,25,23,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
     #milestone-popup.show { display: flex; }
-    .popup-card { background: linear-gradient(135deg, #fdf4ff, #eff6ff); border-radius: 28px; padding: 36px 32px; text-align: center; max-width: 320px; width: 90%; border: 3px solid #a78bfa; box-shadow: 0 20px 60px rgba(124,58,237,0.3); animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    .popup-card { background: #FFFFFF; border-radius: 28px; padding: 36px 32px; text-align: center; max-width: 320px; width: 90%; border: 3px solid #FDBA74; box-shadow: 0 20px 60px rgba(249,115,22,0.25); animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
     @keyframes popIn { from { transform: scale(0.6) rotate(-4deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
     .popup-card .big-emoji { font-size: 4.5rem; display: block; margin-bottom: 10px; animation: wiggle 0.6s ease 0.4s; }
     @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
     .popup-card h3 { font-size: 1.5rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
     .popup-card p { color: var(--muted); font-size: 1rem; font-weight: 600; margin-bottom: 22px; }
-    .btn { display: inline-block; padding: 13px 30px; border-radius: 14px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.18s; background: linear-gradient(135deg, #7c3aed, #ec4899); color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+    .btn { display: inline-block; padding: 13px 30px; border-radius: 14px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.18s; background: #F97316; color: #fff; box-shadow: 0 4px 16px rgba(249,115,22,0.4); }
     .btn:hover { transform: scale(1.05); }
 
     .messages::-webkit-scrollbar { width: 4px; }
-    .messages::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 4px; }
+    .messages::-webkit-scrollbar-thumb { background: #FDBA74; border-radius: 4px; }
 
     .confetti-piece {
       position: fixed; pointer-events: none; z-index: 9999;
@@ -231,8 +212,8 @@
     }
 
     /* ── Admin ── */
-    .admin-btn { position:absolute; top:18px; right:16px; background:#f3f0ff; border:2px solid #c4b5fd; border-radius:10px; padding:7px 12px; font-size:0.82rem; font-weight:800; color:#7c3aed; cursor:pointer; transition:all 0.15s; z-index:10; }
-    .admin-btn:hover { background:#ede9fe; transform:scale(1.05); }
+    .admin-btn { position:absolute; top:18px; right:16px; background:#FFF7ED; border:2px solid #FED7AA; border-radius:10px; padding:7px 12px; font-size:0.82rem; font-weight:800; color:#EA580C; cursor:pointer; transition:all 0.15s; z-index:10; }
+    .admin-btn:hover { background:#FFEDD5; transform:scale(1.05); }
     header { position:relative; }
 
     @media (max-width: 480px) {
@@ -378,10 +359,10 @@
 </div>
 
 <!-- Modal frases guardadas -->
-<div id="saved-modal" style="display:none;position:fixed;inset:0;background:rgba(30,27,75,0.5);z-index:200;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
-  <div style="background:#fff;border-radius:24px;padding:28px 24px;max-width:400px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(124,58,237,0.3);border:3px solid #a78bfa;">
+<div id="saved-modal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:24px;padding:28px 24px;max-width:400px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(249,115,22,0.2);border:3px solid #FDBA74;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 style="font-size:1.2rem;font-weight:900;color:#7c3aed;">⭐ Frases guardadas</h3>
+      <h3 style="font-size:1.2rem;font-weight:900;color:#F97316;">⭐ Frases guardadas</h3>
       <button onclick="closeSaved()" style="background:#f3f4f6;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:700;color:#6b7280;">✕</button>
     </div>
     <div id="saved-list"></div>
@@ -848,9 +829,9 @@ function showSaved() {
 
     const useBtn = document.createElement('button');
     useBtn.textContent = phrase;
-    useBtn.style.cssText = 'flex:1;text-align:left;background:linear-gradient(135deg,#ede9fe,#ddd6fe);border:1.5px solid #c4b5fd;border-radius:12px;padding:10px 14px;cursor:pointer;font-size:0.9rem;font-weight:600;color:#4c1d95;transition:all 0.15s;';
-    useBtn.onmouseenter = () => useBtn.style.background = 'linear-gradient(135deg,#7c3aed,#6d28d9)';
-    useBtn.onmouseleave = () => useBtn.style.background = 'linear-gradient(135deg,#ede9fe,#ddd6fe)';
+    useBtn.style.cssText = 'flex:1;text-align:left;background:#FFF7ED;border:1.5px solid #FDBA74;border-radius:12px;padding:10px 14px;cursor:pointer;font-size:0.9rem;font-weight:600;color:#EA580C;transition:all 0.15s;';
+    useBtn.onmouseenter = () => { useBtn.style.background = '#F97316'; useBtn.style.color = '#fff'; };
+    useBtn.onmouseleave = () => { useBtn.style.background = '#FFF7ED'; useBtn.style.color = '#EA580C'; };
     useBtn.onclick = () => { useSavedPhrase(phrase); closeSaved(); };
 
     const delBtn = document.createElement('button');
@@ -1427,13 +1408,7 @@ function updateSentenceChips() {
     chips.appendChild(ph);
   } else {
     chips.classList.add('filled');
-    const COLORS = [
-      'linear-gradient(135deg,#7c3aed,#6d28d9)',
-      'linear-gradient(135deg,#2563eb,#1d4ed8)',
-      'linear-gradient(135deg,#ec4899,#db2777)',
-      'linear-gradient(135deg,#10b981,#059669)',
-      'linear-gradient(135deg,#f59e0b,#d97706)',
-    ];
+    const COLORS = ['#F97316','#F59E0B','#22C55E','#06B6D4','#8B5CF6','#EC4899'];
     words.forEach((word, i) => {
       const chip = document.createElement('span');
       chip.className = 'sentence-chip';
@@ -1486,7 +1461,7 @@ function isValidPhrase(text) {
 }
 
 function launchConfetti() {
-  const colors = ['#7c3aed','#ec4899','#10b981','#f59e0b','#2563eb','#ef4444','#06b6d4'];
+  const colors = ['#F97316','#F59E0B','#22C55E','#06B6D4','#8B5CF6','#EC4899','#EF4444'];
   const sb = document.querySelector('.sentence-builder');
   const rect = sb.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
