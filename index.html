@@ -2079,8 +2079,7 @@ function sendMessage() {
   const text = ta.value.trim();
   if (!text) return;
 
-  const words = text.trim().split(/\s+/).length;
-  if (words < 3) { showGrammarHint('minwords'); return; }
+  if (text.trim().split(/\s+/).length < 3) { showGrammarHint('minwords'); return; }
   if (!isValidPhrase(text)) { showGrammarHint('noverb'); return; }
 
   stopSpeaking();
