@@ -1632,7 +1632,7 @@ const VALID_SHORT = new Set([
 function isValidPhrase(text) {
   const lower = text.trim().toLowerCase();
   const words = lower.split(/\s+/);
-  if (words.length === 1) return VALID_SHORT.has(lower) || hasVerb(text);
+  if (words.length < 3) return false;
   return hasVerb(text);
 }
 
@@ -2026,11 +2026,15 @@ function reloadAdminCards() {
   if (modal) { closeAdmin(); openAdmin(); }
 }
 
-function showGrammarHint() {
+function showGrammarHint(type = 'noverb') {
   const sb = document.querySelector('.sentence-builder');
   sb.classList.add('invalid');
   setTimeout(() => sb.classList.remove('invalid'), 600);
-  addMessage('🤔 ¡Falta una acción! La frase necesita un verbo. Por ejemplo: "estoy", "quiero", "he ido", "me gusta"...', 'system');
+  let msg = '🤔 ¡Falta una acción! La frase necesita un verbo. Por ejemplo: "estoy", "quiero", "he ido", "me gusta"...';
+  if (type === 'minwords') {
+    msg = '📝 ¡Un poco más! La frase necesita al menos 3 palabras. Agrega más detalles.';
+  }
+  addMessage(msg, 'system');
   const msgs = document.getElementById('messages');
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -2075,7 +2079,9 @@ function sendMessage() {
   const text = ta.value.trim();
   if (!text) return;
 
-  if (!isValidPhrase(text)) { showGrammarHint(); return; }
+  const words = text.trim().split(/\s+/).length;
+  if (words < 3) { showGrammarHint('minwords'); return; }
+  if (!isValidPhrase(text)) { showGrammarHint('noverb'); return; }
 
   stopSpeaking();
   manualTab = null;
