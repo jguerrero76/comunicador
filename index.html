@@ -345,7 +345,6 @@
       <span class="sb-counter"><span id="sb-word-count">0</span> palabras</span>
     </div>
     <div class="sentence-chips" id="sentence-chips">
-      <span class="sentence-placeholder">Toca una palabra de abajo o escribe aquí...</span>
     </div>
     <div class="sb-input-row">
       <textarea id="user-input" placeholder="Escribe aquí..." rows="1"
@@ -1581,10 +1580,6 @@ function updateSentenceChips() {
   chips.innerHTML = '';
   if (words.length === 0) {
     chips.classList.remove('filled');
-    const ph = document.createElement('span');
-    ph.className = 'sentence-placeholder';
-    ph.textContent = 'Toca una palabra de abajo o escribe aquí...';
-    chips.appendChild(ph);
   } else {
     chips.classList.add('filled');
     const COLORS = ['#F97316','#F59E0B','#22C55E','#06B6D4','#8B5CF6','#EC4899'];
