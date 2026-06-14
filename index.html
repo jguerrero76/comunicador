@@ -11,7 +11,7 @@
       --primary-light: #FDBA74;
       --success: #22C55E;
       --warning: #F59E0B;
-      --bg: #FAFAF8;
+      --bg: #0F172A;
       --card: #FFFFFF;
       --text: #1C1917;
       --muted: #78716C;
@@ -22,7 +22,7 @@
 
     body {
       font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-      background: #F5F3EF;
+      background: #0F172A;
       min-height: 100vh;
       padding: 16px;
     }
@@ -33,7 +33,7 @@
       color: #F97316;
       letter-spacing: -0.02em;
     }
-    header p { color: var(--muted); font-size: 0.95rem; margin-top: 4px; }
+    header p { color: #94A3B8; font-size: 0.95rem; margin-top: 4px; }
     .stars-bar {
       display: inline-flex; align-items: center; gap: 8px; margin-top: 10px;
       font-size: 1rem; font-weight: 800;
@@ -65,8 +65,8 @@
     .chat-header { background:var(--card); border-radius:16px; padding:12px 16px; margin-bottom:10px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #E7E5E4; }
     .chat-header .topic-icon { font-size: 2rem; }
     .chat-header h2 { font-size:1.1rem; font-weight:900; color:var(--text); flex:1; }
-    .back-btn { background:#F5F3EF; color:var(--muted); border:none; border-radius:10px; padding:7px 12px; font-size:0.8rem; font-weight:700; cursor:pointer; }
-    .back-btn:hover { background:#FFF7ED; color:#EA580C; }
+    .back-btn { background:#1E293B; color:#94A3B8; border:none; border-radius:10px; padding:7px 12px; font-size:0.8rem; font-weight:700; cursor:pointer; }
+    .back-btn:hover { background:#F97316; color:#fff; }
 
     /* ── Mensajes ── */
     .messages {
@@ -98,7 +98,7 @@
     .word-panel { background: var(--card); border-radius: 16px; padding: 10px 12px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E7E5E4; }
     .word-panel-tabs { display: flex; gap: 6px; margin-bottom: 9px; overflow-x: auto; scrollbar-width: none; }
     .word-panel-tabs::-webkit-scrollbar { display: none; }
-    .tab-btn { border: 2px solid transparent; border-radius: 20px; padding: 5px 13px; font-size: 0.77rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.18s; flex-shrink: 0; background: #F5F3EF; color: #78716C; }
+    .tab-btn { border: 2px solid transparent; border-radius: 20px; padding: 5px 13px; font-size: 0.77rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.18s; flex-shrink: 0; background: #1E293B; color: #94A3B8; }
     .tab-btn.active { color: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.18); }
     .tab-btn:hover:not(.active) { filter: brightness(0.95); transform: scale(1.05); }
     .word-chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -393,7 +393,7 @@ const WORD_BANK = {
   },
   sujetos: {
     label: '👤 Quién',
-    words: ['yo', 'mi familia', 'mis amigos', 'mi madre', 'mi padre',
+    words: ['yo', 'mi familia', 'mis amigos',
             'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli',
             'mi primo Gonzalo', 'el tito Juan', 'el tito Manolo',
             'el tito Rafa', 'la tita Maria', 'la tita María Jesús',
@@ -445,7 +445,7 @@ const WORD_BANK = {
   comida: {
     label: '🍕 Comida',
     words: ['mi comida favorita', 'me gusta comer', 'está muy rico', 'está buenísimo',
-            'en casa', 'en el restaurante', 'lo hace mi madre', 'para comer',
+            'en casa', 'en el restaurante', 'para comer',
             'para cenar', 'para desayunar', 'de postre', 'tiene', 'lleva',
             'con mucho', 'sin', 'caliente', 'frío', 'dulce', 'salado'],
   },
@@ -935,8 +935,6 @@ const NEXT_PATTERNS = {
   '':           ['yo', 'hoy', 'ayer', 'primero', 'me gusta', 'quiero', 'estoy', 'fui'],
   // Pronombres / sujetos
   'yo':         ['he', 'quiero', 'estoy', 'fui', 'me gusta', 'tengo', 'voy', 'soy'],
-  'mi madre':   ['ha', 'dice', 'me ha', 'me lleva', 'hace', 'también'],
-  'mi padre':   ['ha', 'dice', 'me ha', 'me lleva', 'hace', 'también'],
   'mis amigos': ['y yo', 'han', 'jugamos', 'vimos', 'fuimos'],
   // Auxiliares
   'he':         ['comido', 'jugado', 'visto', 'estado', 'hablado', 'ido', 'hecho', 'aprendido', 'trabajado'],
@@ -967,11 +965,11 @@ const NEXT_PATTERNS = {
   'ayer':       ['fui', 'estuve', 'comí', 'jugué', 'vi', 'fue'],
   'mañana':     ['voy', 'tengo', 'hay', 'toca', 'quiero'],
   // Lugar / compañía
-  'con':        ['mis amigos', 'mi madre', 'mi padre', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
+  'con':        ['mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
   'en':         ['casa', 'el cole', 'el parque', 'el patio', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'el restaurante'],
   'a':          ['casa', 'el parque', 'el cole', 'Dima', 'Encajales', 'Logos', 'la Asociación', 'veces'],
   'al':         ['parque', 'cole', 'restaurante', 'polideportivo', 'final'],
-  'con':        ['mis amigos', 'mi madre', 'mi padre', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
+  'con':        ['mis amigos', 'mi familia', 'el abuelo Pepillo', 'la abuela Juanita', 'la abuela Manoli', 'mi primo Gonzalo', 'el tito Rafa', 'Candela', 'Elena', 'Lucía', 'solo'],
   'de':         ['lo que pasó', 'mis amigos', 'mis juegos', 'mis series', 'eso', 'todo'],
   'para':       ['mañana', 'el cole', 'descansar', 'jugar', 'comer', 'aprender'],
   'por':        ['eso', 'la mañana', 'la tarde', 'favor', 'aquí'],
@@ -1018,7 +1016,7 @@ const NEXT_PATTERNS = {
 
 const EMOJI_MAP = {
   // Quién
-  'yo':'🙋','mi madre':'👩','mi padre':'👨','mi familia':'👨‍👩‍👦','mis amigos':'👫',
+  'yo':'🙋','mi familia':'👨‍👩‍👦','mis amigos':'👫',
   'el abuelo Pepillo':'👴','la abuela Juanita':'👵','la abuela Manoli':'👵',
   'mi primo Gonzalo':'👦','el tito Juan':'👨','el tito Manolo':'👨',
   'el tito Rafa':'👨','la tita Maria':'👩','la tita María Jesús':'👩',
@@ -1986,6 +1984,7 @@ function sendMessage() {
   stopSpeaking();
   manualTab = null;
   const words = countWords(text);
+  reachedMilestones = new Set();
   checkMilestones(words);
 
   addMessage(text, 'user');
