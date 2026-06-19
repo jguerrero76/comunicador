@@ -318,6 +318,31 @@
     .crisis-close-btn { margin-top: 20px; background: #334155; color: #94A3B8; border: none; border-radius: 12px; padding: 12px 28px; font-size: 0.9rem; font-weight: 800; cursor: pointer; }
     .crisis-close-btn:hover { background: #475569; color: #fff; }
 
+    /* ── Onboarding de perfil ── */
+    .onboarding-overlay { position:fixed; inset:0; background:#0F172A; z-index:1000; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 16px; }
+    .onboarding-card { max-width:480px; width:100%; }
+    .onboarding-progress { display:flex; gap:7px; justify-content:center; margin-bottom:24px; }
+    .onboarding-dot { width:9px; height:9px; border-radius:50%; background:#334155; transition:background 0.2s; }
+    .onboarding-dot.active { background:#F97316; }
+    .onboarding-title { font-size:1.3rem; font-weight:900; color:#F8FAFC; margin-bottom:6px; text-align:center; }
+    .onboarding-sub { font-size:0.85rem; color:#94A3B8; text-align:center; margin-bottom:22px; line-height:1.5; }
+    .onboarding-option { width:100%; background:#1E293B; border:2.5px solid #334155; border-radius:18px; padding:15px 18px; cursor:pointer; text-align:left; margin-bottom:10px; transition:all 0.15s; display:flex; align-items:center; gap:14px; }
+    .onboarding-option:hover { border-color:#F97316; }
+    .onboarding-option.selected { border-color:#F97316; background:#F9731611; }
+    .onboarding-option .opt-icon { font-size:1.8rem; flex-shrink:0; }
+    .onboarding-option .opt-strong { font-size:0.93rem; color:#F8FAFC; display:block; font-weight:800; margin-bottom:2px; }
+    .onboarding-option .opt-desc { font-size:0.75rem; color:#94A3B8; }
+    .onboarding-btn { width:100%; background:#F97316; color:#fff; border:none; border-radius:14px; padding:14px; font-size:1rem; font-weight:900; cursor:pointer; margin-top:14px; transition:all 0.15s; }
+    .onboarding-btn:hover { background:#EA580C; transform:scale(1.02); }
+    .onboarding-btn:disabled { background:#334155; color:#64748B; cursor:not-allowed; transform:none; }
+    .onboarding-skip { width:100%; background:none; border:none; color:#475569; font-size:0.8rem; font-weight:700; cursor:pointer; padding:10px; margin-top:4px; }
+    .onboarding-topic-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:10px; }
+    .onboarding-topic-btn { background:#1E293B; border:2px solid #334155; border-radius:14px; padding:12px 8px; cursor:pointer; text-align:center; transition:all 0.15s; }
+    .onboarding-topic-btn.selected { border-color:#F97316; background:#F9731611; }
+    .onboarding-topic-btn .t-emoji { font-size:1.5rem; display:block; }
+    .onboarding-topic-btn .t-label { font-size:0.68rem; font-weight:800; color:#94A3B8; display:block; margin-top:4px; }
+    .onboarding-topic-btn.selected .t-label { color:#F97316; }
+
     /* ── Reparación conversacional ── */
     .repair-toggle-btn { background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:20px; padding:6px 14px; font-size:0.8rem; font-weight:800; color:#16A34A; cursor:pointer; transition:all 0.15s; }
     .repair-toggle-btn.active { background:#DCFCE7; border-color:#22C55E; }
@@ -946,10 +971,14 @@ let sessionSpontaneous = 0;   // mensajes desde el área de texto (espontáneos)
 let sessionPrompted = 0;      // mensajes desde respuestas rápidas (provocados)
 let lmeHistory = JSON.parse(localStorage.getItem('comunicador_lme_history') || '[]');
 let progressUnlocked = false;
+// ── Perfil y generalización ─────────────────────────────────────────────────
+let userProfile = JSON.parse(localStorage.getItem('comunicador_profile') || 'null');
+let generalizationData = JSON.parse(localStorage.getItem('comunicador_generalization') || '{}');
 const audioCtx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 
 updateStarsDisplay();
 updateSavedCount();
+setTimeout(checkOnboarding, 400);
 
 // ── Voz (reconocimiento) ─────────────────────────────────────────────────────
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2730,6 +2759,312 @@ function sendCrisisMessage(text) {
   setTimeout(() => { addMessage('Gracias por decirme eso. ' + r.q, 'ai'); showNextPopup(); }, 700);
 }
 
+// ── Fase 3: Onboarding, coaching familiar y generalización ────────────────────
+
+// ── Onboarding de perfil ──────────────────────────────────────────────────────
+
+function checkOnboarding() {
+  if (!userProfile || !userProfile.onboardingDone) openOnboarding();
+}
+
+// Expuestos globalmente para los onclick inline del onboarding
+window._obPrf = null;
+window._obUpdateBtn = null;
+window.obSelect = function(field, val, btn) {
+  if (!window._obPrf) return;
+  window._obPrf[field] = val;
+  btn.closest('.onboarding-card').querySelectorAll('.onboarding-option').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if (window._obUpdateBtn) window._obUpdateBtn();
+};
+window.obToggleTopic = function(key, btn) {
+  if (!window._obPrf) return;
+  const idx = window._obPrf.intereses.indexOf(key);
+  if (idx >= 0) { window._obPrf.intereses.splice(idx, 1); btn.classList.remove('selected'); }
+  else { window._obPrf.intereses.push(key); btn.classList.add('selected'); }
+};
+
+function openOnboarding() {
+  document.getElementById('onboarding-overlay')?.remove();
+
+  const profile = { nombre: 'Gonzalo', estilo: null, lmeBaseline: null, intereses: [], onboardingDone: false };
+  window._obPrf = profile;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'onboarding-overlay';
+  overlay.className = 'onboarding-overlay';
+
+  const card = document.createElement('div');
+  card.className = 'onboarding-card';
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  let step = 0;
+  const steps = [
+    {
+      canContinue: () => true,
+      onContinue: () => { const v = document.getElementById('ob-name')?.value?.trim(); if (v) profile.nombre = v; },
+      render: () => `
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-size:3.5rem;margin-bottom:10px;">💬</div>
+          <div class="onboarding-title">¡Bienvenido al Comunicador!</div>
+          <div class="onboarding-sub">Vamos a personalizar la app para Gonzalo.<br>Solo tardará un minuto. 🙌</div>
+          <input id="ob-name" type="text" value="${profile.nombre}" placeholder="Nombre del usuario"
+            style="width:100%;background:#1E293B;color:#F8FAFC;border:2px solid #F97316;border-radius:12px;padding:12px 16px;font-size:1rem;font-family:inherit;text-align:center;font-weight:800;box-sizing:border-box;">
+        </div>`,
+    },
+    {
+      canContinue: () => !!profile.estilo,
+      render: () => `
+        <div class="onboarding-title">¿Cómo aprende mejor ${profile.nombre}?</div>
+        <div class="onboarding-sub">Esto configura el tipo de ayuda en las sugerencias</div>
+        <button class="onboarding-option${profile.estilo==='gestalt'?' selected':''}" onclick="obSelect('estilo','gestalt',this)">
+          <span class="opt-icon">🧩</span><div><span class="opt-strong">Con frases completas</span><span class="opt-desc">Parte de una frase entera y la completa — Procesamiento Gestalt</span></div>
+        </button>
+        <button class="onboarding-option${profile.estilo==='analitico'?' selected':''}" onclick="obSelect('estilo','analitico',this)">
+          <span class="opt-icon">🔤</span><div><span class="opt-strong">Palabra a palabra</span><span class="opt-desc">Construye la frase paso a paso, eligiendo cada palabra</span></div>
+        </button>
+        <button class="onboarding-option${profile.estilo==='autonomia'?' selected':''}" onclick="obSelect('estilo','autonomia',this)">
+          <span class="opt-icon">💪</span><div><span class="opt-strong">Con mucha autonomía</span><span class="opt-desc">Ya construye frases solo, necesita poco apoyo</span></div>
+        </button>`,
+    },
+    {
+      canContinue: () => profile.lmeBaseline !== null,
+      render: () => `
+        <div class="onboarding-title">¿Cuántas palabras usa normalmente?</div>
+        <div class="onboarding-sub">Usaremos esto como punto de partida para medir el progreso</div>
+        <button class="onboarding-option${profile.lmeBaseline===1.5?' selected':''}" onclick="obSelect('lmeBaseline',1.5,this)">
+          <span class="opt-icon">🌱</span><div><span class="opt-strong">1-2 palabras</span><span class="opt-desc">Comunicación básica, palabras sueltas o parejas</span></div>
+        </button>
+        <button class="onboarding-option${profile.lmeBaseline===3.5?' selected':''}" onclick="obSelect('lmeBaseline',3.5,this)">
+          <span class="opt-icon">🌿</span><div><span class="opt-strong">3-4 palabras</span><span class="opt-desc">Frases cortas con sujeto + verbo + complemento</span></div>
+        </button>
+        <button class="onboarding-option${profile.lmeBaseline===5.5?' selected':''}" onclick="obSelect('lmeBaseline',5.5,this)">
+          <span class="opt-icon">🌳</span><div><span class="opt-strong">5 palabras o más</span><span class="opt-desc">Frases elaboradas con conectores y detalles</span></div>
+        </button>`,
+    },
+    {
+      canContinue: () => true,
+      render: () => `
+        <div class="onboarding-title">¿Qué le interesa más a ${profile.nombre}?</div>
+        <div class="onboarding-sub">Selecciona uno o varios temas favoritos (opcional)</div>
+        <div class="onboarding-topic-grid">
+          ${Object.entries(TOPICS).map(([k,t]) =>
+            `<button class="onboarding-topic-btn${profile.intereses.includes(k)?' selected':''}" onclick="obToggleTopic('${k}',this)">
+              <span class="t-emoji">${t.emoji}</span><span class="t-label">${t.name}</span>
+            </button>`).join('')}
+        </div>`,
+    },
+  ];
+
+  function updateBtn() {
+    const btn = document.getElementById('ob-next');
+    if (btn) btn.disabled = !steps[step].canContinue();
+  }
+  window._obUpdateBtn = updateBtn;
+
+  function renderStep() {
+    card.innerHTML = '';
+    // Dots
+    const dots = document.createElement('div');
+    dots.className = 'onboarding-progress';
+    steps.forEach((_,i) => {
+      const d = document.createElement('div');
+      d.className = 'onboarding-dot' + (i===step?' active':'');
+      dots.appendChild(d);
+    });
+    card.appendChild(dots);
+    // Content
+    const content = document.createElement('div');
+    content.innerHTML = steps[step].render();
+    card.appendChild(content);
+    // Next btn
+    const isLast = step === steps.length - 1;
+    const nextBtn = document.createElement('button');
+    nextBtn.id = 'ob-next';
+    nextBtn.className = 'onboarding-btn';
+    nextBtn.textContent = isLast ? '¡Empezamos! 🚀' : 'Siguiente →';
+    nextBtn.disabled = !steps[step].canContinue();
+    nextBtn.onclick = () => {
+      if (steps[step].onContinue) steps[step].onContinue();
+      if (isLast) { finishOnboarding(); }
+      else { step++; renderStep(); }
+    };
+    card.appendChild(nextBtn);
+    if (!isLast) {
+      const skip = document.createElement('button');
+      skip.className = 'onboarding-skip';
+      skip.textContent = 'Saltar este paso →';
+      skip.onclick = () => { step++; renderStep(); };
+      card.appendChild(skip);
+    }
+    updateBtn();
+  }
+
+  function finishOnboarding() {
+    profile.onboardingDone = true;
+    profile.createdAt = new Date().toISOString();
+    // Aplicar nivel de ayuda según estilo
+    if (profile.estilo === 'gestalt') helpConfig.level = 1;
+    else if (profile.estilo === 'autonomia') helpConfig.level = 3;
+    else helpConfig.level = 2;
+    saveHelpConfig();
+    // Guardar LME baseline
+    if (profile.lmeBaseline) {
+      lmeHistory.push({ date: new Date().toISOString(), topic:'baseline', lme: profile.lmeBaseline, utterances:0, bestWords:0, spontaneous:0, prompted:0, functions:{}, isBaseline:true });
+      try { localStorage.setItem('comunicador_lme_history', JSON.stringify(lmeHistory)); } catch(e) {}
+    }
+    userProfile = profile;
+    localStorage.setItem('comunicador_profile', JSON.stringify(profile));
+    overlay.remove();
+    window._obPrf = null;
+    showToast(`¡Hola ${profile.nombre}! Todo listo 👋`, '🎉', 3000);
+    if (profile.intereses.length > 0) highlightPreferredTopics(profile.intereses);
+  }
+
+  renderStep();
+}
+
+function highlightPreferredTopics(intereses) {
+  document.querySelectorAll('.topic-btn').forEach(btn => {
+    const key = btn.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+    if (key && intereses.includes(key)) {
+      btn.style.boxShadow = '0 0 0 3px #F97316, 0 8px 24px rgba(249,115,22,0.3)';
+    }
+  });
+}
+
+// ── Coaching semanal para el adulto/cuidador ──────────────────────────────────
+
+const COACHING_TIPS = [
+  {
+    cond: d => d.avgLME < 2.5,
+    icon:'📈', title:'Expansión +1',
+    tip:  d => `La LME media esta semana fue ${d.avgLME}. Practica el modelado +1: cuando ${d.nombre} diga "quiero agua", di tú "Yo quiero agua ahora". Espera 5 segundos a que repita la versión larga.`,
+    ref: 'Hanen / Modelado lingüístico'
+  },
+  {
+    cond: d => (d.fnPct.pregunta || 0) < 0.1,
+    icon:'❓', title:'Trampas de curiosidad',
+    tip:  d => `${d.nombre} apenas ha hecho preguntas esta semana. Prueba las trampas de curiosidad: empieza a hacer algo que le guste, para a la mitad y espera en silencio. Si no pregunta, di "Tengo algo que contarte..." y haz una pausa larga.`,
+    ref: 'Milieu Teaching / VB-MAPP'
+  },
+  {
+    cond: d => d.spontPct < 40,
+    icon:'👁️', title:'Estrategia OWL',
+    tip:  d => `Solo el ${d.spontPct}% de los mensajes fueron espontáneos. Esta semana practica OWL: Observa qué le interesa, Espera 5-10 segundos en silencio, Escucha antes de hablar tú. Resiste el impulso de preguntar primero.`,
+    ref: 'Hanen — More Than Words'
+  },
+  {
+    cond: d => d.lmeTrend > 0.3,
+    icon:'🌟', title:'¡Progreso! Añade "porque"',
+    tip:  d => `La LME está subiendo (+${d.lmeTrend.toFixed(1)} esta semana). Es el momento de añadir el conector "porque": cuando expanda una frase, modela: "quiero ir al parque → quiero ir al parque porque me gusta correr."`,
+    ref: 'Etapa IV de Brown'
+  },
+  {
+    cond: d => (d.fnPct.narracion || 0) < 0.15,
+    icon:'📖', title:'Narración con fotos',
+    tip:  d => `La narración es escasa. Usa fotos del día: muéstrale una foto y di "¿qué pasó aquí?". Acepta cualquier respuesta y expande: "Sí, fuiste al parque → Fuiste al parque con papá ayer."`,
+    ref: 'Script fading / NLA (Prizant)'
+  },
+  {
+    cond: () => true,
+    icon:'🎯', title:'Refuerzo natural',
+    tip:  d => `Esta semana usa el refuerzo natural: cuando ${d.nombre} pida algo con una frase completa, dáselo de inmediato. La consecuencia natural (conseguir lo que pide) es más poderosa que cualquier elogio externo.`,
+    ref: 'Autodeterminación — Deci & Ryan'
+  },
+];
+
+function getCoachingTip() {
+  const recent = lmeHistory.filter(s => !s.isBaseline).slice(0, 7);
+  if (recent.length === 0) return null;
+  const avgLME = Math.round(recent.reduce((s,e) => s + e.lme, 0) / recent.length * 10) / 10;
+  const lmeTrend = recent.length >= 2 ? recent[0].lme - recent[recent.length-1].lme : 0;
+  const allFns = {}; let totalSp = 0; let totalMsg = 0;
+  recent.forEach(s => {
+    Object.entries(s.functions||{}).forEach(([fn,c]) => { allFns[fn]=(allFns[fn]||0)+c; totalMsg+=c; });
+    totalSp += (s.spontaneous||0);
+  });
+  const total = Object.values(allFns).reduce((a,b)=>a+b,0)||1;
+  const fnPct = {};
+  Object.entries(allFns).forEach(([fn,c]) => fnPct[fn] = c/total);
+  const spontPct = totalMsg > 0 ? Math.round(totalSp/totalMsg*100) : 0;
+  const nombre = userProfile?.nombre || 'Gonzalo';
+  const d = { avgLME, lmeTrend, fnPct, spontPct, nombre };
+  const tip = COACHING_TIPS.find(t => t.cond(d));
+  return tip ? { icon:tip.icon, title:tip.title, tip:tip.tip(d), ref:tip.ref } : null;
+}
+
+// ── Registro de generalización ────────────────────────────────────────────────
+
+function saveGeneralization() {
+  try { localStorage.setItem('comunicador_generalization', JSON.stringify(generalizationData)); } catch(e) {}
+}
+
+function renderGeneralizationSection(container) {
+  const section = document.createElement('div');
+  section.style.cssText = 'background:#1E293B;border:1.5px solid #334155;border-radius:20px;padding:18px;margin-bottom:14px;';
+
+  const totalG = Object.keys(generalizationData).length;
+  const totalC = Object.values(generalizationData).reduce((s,c) => s+c.length, 0);
+
+  section.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div>
+      <div style="font-size:0.7rem;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">📍 Registro de Generalización</div>
+      <div style="font-size:0.75rem;color:#94A3B8;margin-top:3px;">${totalG} frases generalizadas · ${totalC} contextos registrados</div>
+    </div>
+  </div>`;
+
+  const CTX = [
+    { key:'casa',  emoji:'🏠', label:'Casa'  },
+    { key:'cole',  emoji:'📚', label:'Cole'  },
+    { key:'calle', emoji:'🛒', label:'Calle' },
+  ];
+
+  const candidates = [...new Set([...savedPhrases.slice(0, 12)])];
+
+  if (candidates.length === 0) {
+    const empty = document.createElement('p');
+    empty.style.cssText = 'color:#475569;font-size:0.8rem;text-align:center;padding:10px 0;';
+    empty.textContent = 'Guarda frases con ⭐ para marcar cuándo las usó en casa, el cole o la calle.';
+    section.appendChild(empty);
+  } else {
+    candidates.forEach(phrase => {
+      const marked = generalizationData[phrase] || [];
+      const row = document.createElement('div');
+      row.style.cssText = 'padding:10px 0;border-bottom:1px solid #ffffff08;';
+      const pt = document.createElement('div');
+      pt.style.cssText = 'font-size:0.82rem;font-weight:700;color:#CBD5E1;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      pt.textContent = `"${phrase}"`;
+      row.appendChild(pt);
+      const ctxRow = document.createElement('div');
+      ctxRow.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;';
+      CTX.forEach(ctx => {
+        const isOn = marked.includes(ctx.key);
+        const btn = document.createElement('button');
+        btn.style.cssText = `background:${isOn?'#22C55E':'#334155'};color:${isOn?'#fff':'#94A3B8'};border:1.5px solid ${isOn?'#22C55E':'#475569'};border-radius:20px;padding:4px 11px;font-size:0.72rem;font-weight:800;cursor:pointer;transition:all 0.15s;`;
+        btn.innerHTML = `${ctx.emoji} ${ctx.label}`;
+        btn.onclick = () => {
+          if (isOn) {
+            generalizationData[phrase] = (generalizationData[phrase]||[]).filter(c=>c!==ctx.key);
+            if (generalizationData[phrase].length===0) delete generalizationData[phrase];
+          } else {
+            if (!generalizationData[phrase]) generalizationData[phrase] = [];
+            if (!generalizationData[phrase].includes(ctx.key)) generalizationData[phrase].push(ctx.key);
+            showToast(`"${phrase.slice(0,18)}..." en ${ctx.label}`, '📍', 2000);
+          }
+          saveGeneralization();
+          renderProgressPanel();
+        };
+        ctxRow.appendChild(btn);
+      });
+      row.appendChild(ctxRow);
+      section.appendChild(row);
+    });
+  }
+  container.appendChild(section);
+}
+
 // ── Fase 2: Pragmática, funciones y reparación ────────────────────────────────
 
 // Trampas de comunicación (Milieu Teaching): mensajes que provocan funciones deficitarias
@@ -3123,6 +3458,27 @@ function renderProgressPanel() {
     });
     wrap.appendChild(histCard);
   }
+
+  // ── Coaching semanal ──────────────────────────────────────────────────────
+  const coaching = getCoachingTip();
+  if (coaching) {
+    const coachCard = document.createElement('div');
+    coachCard.style.cssText = 'background:linear-gradient(135deg,#1E293B,#0F172A);border:2px solid #F97316;border-radius:20px;padding:18px;margin-bottom:14px;';
+    coachCard.innerHTML = `
+      <div style="font-size:0.7rem;font-weight:800;color:#F97316;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">🎯 Consejo de la semana</div>
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <span style="font-size:2rem;flex-shrink:0;">${coaching.icon}</span>
+        <div>
+          <div style="font-size:0.95rem;font-weight:900;color:#F8FAFC;margin-bottom:6px;">${coaching.title}</div>
+          <div style="font-size:0.82rem;color:#CBD5E1;line-height:1.5;">${coaching.tip}</div>
+          <div style="font-size:0.68rem;color:#64748B;margin-top:8px;font-style:italic;">📚 ${coaching.ref}</div>
+        </div>
+      </div>`;
+    wrap.appendChild(coachCard);
+  }
+
+  // ── Registro de generalización ────────────────────────────────────────────
+  renderGeneralizationSection(wrap);
 
   // ── Acciones ──────────────────────────────────────────────────────────────
   const exportBtn = document.createElement('button');
