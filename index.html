@@ -357,6 +357,7 @@
     <button class="topic-btn" data-color="yellow"  onclick="selectTopic('musica')">  <span class="emoji">🎸</span><span class="label">Música</span></button>
     <button class="topic-btn" data-color="red"     onclick="selectTopic('cole')">    <span class="emoji">📚</span><span class="label">El cole</span></button>
     <button class="topic-btn" data-color="indigo"  onclick="selectTopic('deporte')"> <span class="emoji">🏆</span><span class="label">Deportes</span></button>
+    <button class="topic-btn" data-color="green" onclick="selectTopic('necesidades')"><span class="emoji">🙋</span><span class="label">Necesidades</span></button>
   </div>
 </div>
 
@@ -389,7 +390,7 @@
   <div class="sentence-builder">
     <div class="sb-header">
       <span class="sb-label">✍️ Tu frase</span>
-      <span class="sb-counter"><span id="sb-word-count">0</span> palabras</span>
+      <span class="sb-counter"><span id="sb-word-count">0</span> palabras<span id="sb-level-badge" style="display:none;margin-left:5px;padding:1px 7px;border-radius:99px;font-size:0.62rem;font-weight:900;color:#fff;"></span></span>
     </div>
     <div class="sentence-chips" id="sentence-chips">
     </div>
@@ -818,6 +819,23 @@ const TOPICS = {
       { praise: '¡Qué pasada!',                       q: '¿Hay algún deporte que no te guste nada?' },
       { praise: '¡Muy interesante!',                  q: '¿Dónde sueles practicar o ver ese deporte?' },
       { praise: '¡Brutal!',                           q: '¿Cuánto tiempo llevas interesado en ese deporte?' },
+    ],
+  },
+  necesidades: {
+    name: 'Necesidades', emoji: '🙋',
+    starter: '¡Hola Gonzalo! ¿Qué quieres contarme o necesitas decirme hoy?',
+    wordCategories: ['verbos', 'comunes', 'sujetos', 'sentimientos', 'sensaciones'],
+    responses: [
+      { praise: '¡Gracias por decirme eso!',          q: '¿Hay algo más que necesites o quieras decirme?' },
+      { praise: '¡Me alegra que me lo hayas dicho!',   q: '¿Cómo puedo ayudarte?' },
+      { praise: '¡Muy bien comunicado!',               q: '¿Hay algo que quieras que cambie?' },
+      { praise: '¡Perfecto, lo entiendo!',             q: '¿Necesitas algo más?' },
+      { praise: '¡Qué bien que lo expresas!',          q: '¿Quieres contarme algo más?' },
+      { praise: '¡Gracias por compartirlo!',           q: '¿Cómo te encuentras ahora mismo?' },
+      { praise: '¡Eso está muy bien dicho!',           q: '¿Hay algo que te esté molestando?' },
+      { praise: '¡Me parece muy importante!',          q: '¿Puedo hacer algo para ayudarte?' },
+      { praise: '¡Entendido, gracias!',                q: '¿Qué más quieres contarme?' },
+      { praise: '¡Bien dicho!',                        q: '¿Cómo te sientes después de decirlo?' },
     ],
   },
 };
@@ -1686,6 +1704,17 @@ function updateSentenceChips() {
   const text = ta ? ta.value.trim() : '';
   const words = text ? text.split(/\s+/) : [];
   if (sbCount) sbCount.textContent = words.length;
+  const levelInfo = getSentenceLevel(text);
+  const badge = document.getElementById('sb-level-badge');
+  if (badge) {
+    if (levelInfo) {
+      badge.style.display = 'inline-block';
+      badge.style.background = levelInfo.color;
+      badge.textContent = levelInfo.label + ' · ' + levelInfo.desc;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
   chips.innerHTML = '';
   if (words.length === 0) {
     chips.classList.remove('filled');
@@ -2214,7 +2243,9 @@ function sendMessage() {
   const r = topic.responses[responseIndex % topic.responses.length];
   responseIndex++;
 
+  const reformulation = getModeledReformulation(text);
   setTimeout(() => {
+    if (reformulation) addModelMessage(reformulation);
     addMessage(r.praise + ' ' + r.q, 'ai');
     showNextPopup();
   }, 600);
@@ -2273,6 +2304,55 @@ function showToast(msg, icon = '✓', duration = 2000) {
   toast.textContent = icon + ' ' + msg;
   document.body.appendChild(toast);
   setTimeout(() => { toast.style.animation = 'slideDown 0.3s ease'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, duration);
+}
+
+// ── Modelado lingüístico (+1 nivel) ──────────────────────────────────────────
+function getModeledReformulation(text) {
+  const t = text.trim();
+  if (!t) return null;
+  const n = t.split(/\s+/).length;
+  const tl = t.toLowerCase();
+  const hasElaborated = /porque|por favor|\ben\b|\ba\b|\bal\b|\baquí\b|\bcasa\b/.test(tl);
+  if (n > 5 || hasElaborated) return null;
+  if ((n === 3 || n === 4) && !/por favor/.test(tl)) return t + ' por favor';
+  if ((n === 3 || n === 4) && !/\b(en|a|al|aquí|casa)\b/.test(tl)) return t + ' en casa';
+  if (n >= 3 && n <= 5 && !/porque/.test(tl)) return t + ' porque me gusta';
+  return null;
+}
+
+function addModelMessage(reformulation) {
+  const msgs = document.getElementById('messages');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'msg system';
+  div.style.cssText = 'border-left:4px solid #22C55E;text-align:left;background:#F0FDF4;color:#166534;border-radius:14px;padding:10px 14px;max-width:95%;align-self:flex-start;';
+  div.innerHTML = `<div style="font-size:0.72rem;font-weight:700;color:#22C55E;margin-bottom:4px;">💡 También se puede decir:</div><div style="font-size:0.95rem;font-weight:700;">"${reformulation}"</div><div style="display:flex;gap:8px;margin-top:8px;"><button onclick="speakText('${reformulation.replace(/'/g,"\\'")}',this)" style="border:none;border-radius:8px;padding:4px 10px;background:#DCFCE7;color:#16A34A;font-weight:800;font-size:0.8rem;cursor:pointer;">🔊</button><button onclick="useModeledText('${reformulation.replace(/'/g,"\\'")}',this)" style="border:none;border-radius:8px;padding:4px 12px;background:#22C55E;color:#fff;font-weight:800;font-size:0.8rem;cursor:pointer;">Usar</button></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function useModeledText(text) {
+  const ta = document.getElementById('user-input');
+  if (ta) {
+    ta.value = text;
+    updateSentenceChips();
+    ta.focus();
+  }
+}
+
+// ── Nivel de frase en tiempo real ─────────────────────────────────────────────
+function getSentenceLevel(text) {
+  const t = text.trim();
+  if (!t) return null;
+  const n = t.split(/\s+/).length;
+  const tl = t.toLowerCase();
+  const hasConnector = /\b(en|a|al|porque|ahora)\b/.test(tl);
+  if (n === 1) return { level: 1, label: 'N1', color: '#94A3B8', desc: 'Palabra' };
+  if (n === 2) return { level: 2, label: 'N2', color: '#F59E0B', desc: '2 palabras' };
+  if (n >= 6 || /porque/.test(tl)) return { level: 5, label: 'N5', color: '#8B5CF6', desc: 'Frase elaborada' };
+  if ((n >= 3 && n <= 5) && hasConnector) return { level: 4, label: 'N4', color: '#3B82F6', desc: 'Frase completa' };
+  if (n >= 3 && n <= 4) return { level: 3, label: 'N3', color: '#22C55E', desc: 'Frase corta' };
+  return null;
 }
 
 // ── Expansión de frases (+1 nivel) ───────────────────────────────────────────
